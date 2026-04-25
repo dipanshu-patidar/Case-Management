@@ -143,19 +143,21 @@ export function AdminDashboard({ navigate, toast, openModal }) {
 
   if (loading) {
     return (
-      <div className="animate-fade-in flex flex-col items-center justify-center min-h-[40vh] gap-3">
-        <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-[13px] text-slate-500">Loading dashboard…</p>
+      <div className="animate-fade-in flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <div className="w-12 h-12 border-4 border-[#0057c7] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[14px] text-[#8a94a6] font-bold uppercase tracking-widest">Initializing Dashboard...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="animate-fade-in space-y-4">
-        <Card className="border-red-200 bg-red-50/50">
-          <p className="text-[13px] text-red-800 font-600">{error}</p>
-          <button type="button" onClick={() => window.location.reload()} className="btn btn-secondary btn-sm mt-3">Retry</button>
+      <div className="animate-fade-in py-12">
+        <Card className="border-[#ef4444]/20 bg-[#ef4444]/5 text-center p-12">
+          <div className="text-4xl mb-4">⚠️</div>
+          <p className="text-xl font-800 text-white mb-2">Sync Interrupted</p>
+          <p className="text-[14px] text-[#8a94a6] mb-6 max-w-md mx-auto">{error}</p>
+          <button type="button" onClick={() => window.location.reload()} className="btn btn-primary px-8">Reconnect System</button>
         </Card>
       </div>
     );
@@ -167,118 +169,167 @@ export function AdminDashboard({ navigate, toast, openModal }) {
       label: item.practiceArea,
       pct: item.pct,
       amount: item.amountFormatted,
-      color: progressColors[i % progressColors.length],
+      color: i === 0 ? 'bg-[#0057c7]' : i === 1 ? 'bg-[#22c55e]' : i === 2 ? 'bg-[#f59e0b]' : 'bg-[#38bdf8]',
     }))
-    : [{ label: 'No paid revenue this month', pct: 0, amount: '—', color: 'bg-slate-300' }];
+    : [{ label: 'No paid revenue this month', pct: 0, amount: '—', color: 'bg-white/10' }];
 
   const deadlines = dash.upcomingDeadlines.length ? dash.upcomingDeadlines : [];
 
   return (
-    <div className="animate-fade-in space-y-4">
-      <PageHeader title="Dashboard" subtitle={`Welcome back! Practice overview · ${dash.revenue.monthLabel}`}>
-        <button onClick={exportReport} className="btn btn-secondary">Export Report</button>
-        <div className="flex gap-2">
-          <button onClick={() => openModal('conflict-check')} className="btn btn-secondary">Conflict Check</button>
-          <button onClick={() => openModal('add-case')} className="btn btn-primary">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-            New Matter
-          </button>
-        </div>
+    <div className="animate-fade-in space-y-6 pb-12">
+      {/* SECTION A: PAGE HEADER */}
+      <PageHeader 
+        title="Dashboard" 
+        subtitle={`Welcome back, Administrator. System health optimized · ${dash.revenue.monthLabel}`}
+      >
+        <button onClick={exportReport} className="btn btn-secondary">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+          Export Report
+        </button>
+        <button onClick={() => openModal('conflict-check')} className="btn btn-secondary">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+          Conflict Check
+        </button>
+        <button onClick={() => openModal('add-case')} className="btn btn-primary">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+          New Matter
+        </button>
       </PageHeader>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Total Clients" value={String(c.totalClients)} icon="👥" iconBg="bg-blue-50" gradient="linear-gradient(90deg,#0B1F3A,#C9A24A)" />
-        <StatCard label="Open Matters" value={String(c.openMatters)} icon="📁" iconBg="bg-emerald-50" gradient="linear-gradient(90deg,#10b981,#34d399)" />
-        <StatCard label="Upcoming Deadlines" value={String(c.upcomingDeadlineCount)} icon="⏰" iconBg="bg-amber-50" gradient="linear-gradient(90deg,#f59e0b,#fbbf24)" />
-        <StatCard label={`Revenue (${dash.revenue.monthLabel.split(' ')[0]})`} value={dash.revenue.totalFormatted} icon="💰" iconBg="bg-accent-50" gradient="linear-gradient(90deg,#0B1F3A,#C9A24A)" />
+      {/* SECTION B: KPI CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="Total Clients" value={String(c.totalClients)} 
+          icon={<svg className="w-6 h-6 text-[#0057c7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></svg>} 
+          iconBg="bg-[#0057c7]/10" gradient="#0057c7" />
+        <StatCard label="Open Matters" value={String(c.openMatters)} 
+          icon={<svg className="w-6 h-6 text-[#22c55e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>} 
+          iconBg="bg-[#22c55e]/10" gradient="#22c55e" />
+        <StatCard label="Upcoming Deadlines" value={String(c.upcomingDeadlineCount)} 
+          icon={<svg className="w-6 h-6 text-[#f59e0b]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>} 
+          iconBg="bg-[#f59e0b]/10" gradient="#f59e0b" />
+        <StatCard label={`Revenue (${dash.revenue.monthLabel.split(' ')[0]})`} value={dash.revenue.totalFormatted} 
+          icon={<svg className="w-6 h-6 text-[#38bdf8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10h1m11 0h1m-6 0h1m-10 11v-11m16 11v-11m-6 11v-11m-5 11v-11" /></svg>} 
+          iconBg="bg-[#38bdf8]/10" gradient="#38bdf8" />
       </div>
 
-      {/* Content Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-[13px] font-600 text-slate-900">Recent Matters</h3>
-            <button onClick={() => navigate('/admin/matters')} className="text-[12px] text-primary-600 hover:underline font-500">View all →</button>
-          </div>
-          <div className="space-y-1">
-            {dash.recentMatters.length === 0 ? (
-              <p className="text-[12px] text-slate-500 py-4 text-center">No matters yet.</p>
-            ) : (
-              dash.recentMatters.map((m) => (
-                <div key={m.id} onClick={() => navigate(`/admin/matters/${m.id}`)}
-                  className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors group">
-                  <div className="w-8 h-8 bg-primary-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-500 text-slate-900 truncate group-hover:text-primary-600 transition-colors">{m.title}</p>
-                    <p className="text-[11px] text-slate-400">{m.matterNumber} · {m.clientName}</p>
-                  </div>
-                  <Badge status={matterStatusForBadge(m.status)} />
+      {/* SECTION C: TWO COLUMN CONTENT */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* LEFT LARGE CARD: Recent Matters */}
+        <div className="lg:col-span-2">
+          <Card className="h-full">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#0057c7]/10 flex items-center justify-center text-white">
+                  <svg className="w-6 h-6 text-[#0057c7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
                 </div>
-              ))
-            )}
-          </div>
-        </Card>
-
-        <div className="space-y-4">
-          <Card>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-[13px] font-600 text-slate-900">Upcoming Deadlines</h3>
-              <button onClick={() => navigate('/admin/calendar')} className="text-[12px] text-primary-600 hover:underline font-500">Calendar →</button>
+                <h3 className="text-lg font-800 text-white tracking-tight">Recent Matters</h3>
+              </div>
+              <button onClick={() => navigate('/admin/matters')} className="text-[12px] text-[#38bdf8] font-700 uppercase tracking-widest hover:underline">Full Registry →</button>
             </div>
-            <div className="space-y-1.5">
-              {deadlines.length === 0 ? (
-                <p className="text-[12px] text-slate-500 py-2">No invoice due dates in the next window.</p>
+            <div className="space-y-2">
+              {dash.recentMatters.length === 0 ? (
+                <EmptyState icon="📂" title="No Recent Activity" desc="No legal matters have been registered recently." />
               ) : (
-                deadlines.map((e, i) => (
-                  <div key={i} className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-50 transition-colors">
-                    <div className="w-9 h-9 rounded-lg bg-primary-50 flex flex-col items-center justify-center flex-shrink-0">
-                      <span className="text-[14px] font-700 text-primary-700 leading-none">{e.day}</span>
-                      <span className="text-[8px] text-primary-400 uppercase">{e.month}</span>
+                dash.recentMatters.map((m) => (
+                  <div key={m.id} onClick={() => navigate(`/admin/matters/${m.id}`)}
+                    className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] hover:border-white/10 cursor-pointer transition-all group">
+                    <div className="w-12 h-12 bg-[#0057c7]/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#0057c7] transition-all">
+                      <svg className="w-6 h-6 text-[#38bdf8] group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[12px] font-500 text-slate-800 truncate">{e.title}</p>
-                      <p className="text-[11px] text-slate-400">{e.time || 'Due'}</p>
+                      <p className="text-[15px] font-700 text-white truncate group-hover:text-[#38bdf8] transition-colors">{m.title}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[11px] font-800 text-[#8a94a6] uppercase tracking-widest">{m.matterNumber}</span>
+                        <span className="text-[#8a94a6]/40">•</span>
+                        <span className="text-[11px] font-700 text-[#8a94a6]">{m.clientName}</span>
+                      </div>
                     </div>
-                    <span className={`text-[11px] font-600 px-1.5 py-0.5 rounded-full ${e.color === 'red' ? 'bg-red-50 text-red-600' :
-                        e.color === 'amber' ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'}`}>
-                      {e.color === 'red' ? 'Urgent' : e.color === 'amber' ? 'Soon' : 'Due'}
-                    </span>
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                      <Badge status={matterStatusForBadge(m.status)} />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </Card>
+        </div>
+
+        {/* RIGHT COLUMN */}
+        <div className="space-y-6">
+          {/* Upcoming Deadlines */}
+          <Card>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-[15px] font-800 text-white tracking-tight uppercase tracking-[0.1em]">Upcoming Deadlines</h3>
+              <button onClick={() => navigate('/admin/calendar')} className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#8a94a6] hover:text-white transition-all">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              </button>
+            </div>
+            <div className="space-y-3">
+              {deadlines.length === 0 ? (
+                <p className="text-[13px] text-[#8a94a6] py-4 text-center font-medium">Clear docket for today.</p>
+              ) : (
+                deadlines.map((e, i) => (
+                  <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] transition-all group">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 flex flex-col items-center justify-center flex-shrink-0 group-hover:bg-[#0057c7]/20 transition-all">
+                      <span className="text-[15px] font-900 text-white leading-none">{e.day}</span>
+                      <span className="text-[9px] text-[#38bdf8] font-900 uppercase tracking-tighter mt-0.5">{e.month}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-700 text-white truncate">{e.title}</p>
+                      <p className="text-[11px] text-[#8a94a6] mt-0.5 font-semibold">{e.time || 'All Day'}</p>
+                    </div>
+                    <div className={`w-1.5 h-1.5 rounded-full ${e.color === 'red' ? 'bg-[#ef4444]' : e.color === 'amber' ? 'bg-[#f59e0b]' : 'bg-[#38bdf8]'}`} />
                   </div>
                 ))
               )}
             </div>
           </Card>
 
+          {/* Revenue Breakdown */}
           <Card>
-            <h3 className="text-[13px] font-600 text-slate-900 mb-3">Revenue Breakdown</h3>
-            {revRows.map(item => (
-              <div key={item.label} className="mb-2.5 last:mb-0">
-                <div className="flex justify-between mb-1">
-                  <span className="text-[12px] text-slate-600">{item.label}</span>
-                  <span className="text-[12px] font-600 text-slate-800">{item.amount}</span>
+            <h3 className="text-[15px] font-800 text-white tracking-tight uppercase tracking-[0.1em] mb-6">Revenue Breakdown</h3>
+            <div className="space-y-5">
+              {revRows.map(item => (
+                <div key={item.label} className="group">
+                  <div className="flex justify-between items-end mb-2">
+                    <span className="text-[12px] font-700 text-[#8a94a6] uppercase tracking-wider">{item.label}</span>
+                    <span className="text-[13px] font-900 text-white">{item.amount}</span>
+                  </div>
+                  <ProgressBar pct={item.pct} color={item.color} />
                 </div>
-                <ProgressBar pct={item.pct} color={item.color} />
+              ))}
+            </div>
+            <div className="mt-6 pt-5 border-t border-white/5">
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] font-700 text-[#8a94a6]">TOTAL REVENUE</span>
+                <span className="text-xl font-900 text-[#22c55e] tracking-tighter">{dash.revenue.totalFormatted}</span>
               </div>
-            ))}
+            </div>
           </Card>
         </div>
       </div>
 
+      {/* SECTION D: FULL WIDTH ACTIVITY CARD */}
       <Card>
-        <h3 className="text-[13px] font-600 text-slate-900 mb-3">Recent Activity</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 rounded-xl bg-[#f59e0b]/10 flex items-center justify-center text-white">
+                <svg className="w-6 h-6 text-[#f59e0b]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+             </div>
+             <h3 className="text-lg font-800 text-white tracking-tight">Recent Activity Feed</h3>
+          </div>
+          <button className="text-[12px] text-[#8a94a6] font-800 uppercase tracking-widest hover:text-white transition-colors">Audit Log</button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-1">
           {dash.activityFeed.length === 0 ? (
-            <p className="text-[12px] text-slate-500 col-span-full py-2">No activity recorded yet.</p>
+            <p className="text-[13px] text-[#8a94a6] col-span-full py-8 text-center">No system events recorded yet.</p>
           ) : (
             dash.activityFeed.map((item, i) => (
-              <div key={i} className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-50 transition-colors">
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-sm ${item.bg}`}>{item.icon}</div>
+              <div key={i} className="flex items-center gap-4 py-3 px-2 rounded-xl hover:bg-white/[0.03] transition-all group">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-xl bg-white/5 group-hover:scale-110 transition-transform shadow-lg`}>{item.icon}</div>
                 <div className="min-w-0">
-                  <p className="text-[12px] text-slate-700 truncate">{item.text}</p>
-                  <p className="text-[11px] text-slate-400">{item.time}</p>
+                  <p className="text-[13.5px] font-600 text-[#dbe7ff] truncate group-hover:text-white transition-colors">{item.text}</p>
+                  <p className="text-[11px] text-[#8a94a6] mt-0.5 font-bold uppercase tracking-tighter">{item.time}</p>
                 </div>
               </div>
             ))
@@ -288,6 +339,7 @@ export function AdminDashboard({ navigate, toast, openModal }) {
     </div>
   );
 }
+
 
 // ─────────────────────────────────────────────────────────
 //  CLIENTS PAGE
@@ -335,68 +387,98 @@ export function ClientsPage({ navigate, toast, openModal }) {
 
   if (loading) {
     return (
-      <div className="animate-fade-in flex flex-col items-center justify-center min-h-[40vh] gap-3">
-        <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-[13px] text-slate-500">Loading clients…</p>
+      <div className="animate-fade-in flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <div className="w-12 h-12 border-4 border-[#0057c7] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[14px] text-[#8a94a6] font-bold uppercase tracking-widest">Compiling Registry...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="animate-fade-in space-y-4">
-        <Card className="border-red-200 bg-red-50/50">
-          <p className="text-[13px] text-red-800 font-600">{error}</p>
-          <button type="button" onClick={load} className="btn btn-secondary btn-sm mt-3">Retry</button>
+      <div className="animate-fade-in py-12">
+        <Card className="border-[#ef4444]/20 bg-[#ef4444]/5 text-center p-12">
+          <div className="text-4xl mb-4">⚠️</div>
+          <p className="text-xl font-800 text-white mb-2">Sync Error</p>
+          <p className="text-[14px] text-[#8a94a6] mb-6 max-w-md mx-auto">{error}</p>
+          <button type="button" onClick={load} className="btn btn-primary px-8">Retry Connection</button>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in space-y-4">
-      <PageHeader title="Clients" subtitle={`${clients.length} total clients registered`}>
+    <div className="animate-fade-in space-y-6">
+      <PageHeader title="Clients" subtitle={`${clients.length} total clients registered in system`}>
         <button onClick={() => openModal('add-client')} className="btn btn-primary">
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-          Add Client
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+          Add New Client
         </button>
       </PageHeader>
-      <Table headers={['Client', 'Email', 'Phone', 'Type', 'Matters', 'Status', 'Joined', '']}
-        searchPlaceholder="Search clients..." onSearch={setSearch}
+
+      <Table headers={['Client Identity', 'Contact Channel', 'Classification', 'Active Matters', 'Access Status', 'Date Enrolled', '']}
+        searchPlaceholder="Search clients by name or email..." onSearch={setSearch}
         actions={
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="btn btn-secondary text-[12px]">
-            <option>All Status</option><option>Active</option><option>Pending</option><option>Inactive</option>
-          </select>
+          <Select 
+            value={statusFilter} 
+            onChange={e => setStatusFilter(e.target.value)} 
+            className="h-9 min-w-[140px] !py-0 !px-3 text-[12px] rounded-xl"
+          >
+            <option value="All Status">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Pending">Pending</option>
+            <option value="Inactive">Inactive</option>
+          </Select>
         }>
         {filtered.map(c => (
-          <Tr key={c.id}>
-            <Td className="whitespace-nowrap">
-              <div className="flex items-center gap-2.5">
-                <Avatar initials={c.avatar} size="sm" />
-                <div className="whitespace-nowrap"><p className="font-500 text-slate-900 hover:text-primary-600">{c.name}</p><p className="text-[11px] text-slate-400">{c.id}</p></div>
+          <Tr key={c.id} onClick={() => navigate(`/admin/clients/${c.id}`)}>
+            <Td>
+              <div className="flex items-center gap-4">
+                <Avatar initials={c.avatar} size="sm" color="#0057c7" />
+                <div className="min-w-0">
+                  <p className="font-700 text-white group-hover:text-[#38bdf8] transition-colors truncate">{c.name}</p>
+                  <p className="text-[11px] text-[#8a94a6] font-800 uppercase tracking-widest mt-0.5">{c.id}</p>
+                </div>
               </div>
             </Td>
-            <Td className="text-slate-500 whitespace-nowrap">{c.email}</Td>
-            <Td className="text-slate-500 whitespace-nowrap">{c.phone}</Td>
-            <Td className="whitespace-nowrap"><span className="text-[12px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-500">{c.type}</span></Td>
-            <Td className="whitespace-nowrap"><span className="font-600 text-slate-900">{c.cases}</span></Td>
-            <Td className="whitespace-nowrap"><Badge status={c.status} /></Td>
-            <Td className="text-slate-400 text-[12px] whitespace-nowrap">{c.joined}</Td>
-            <Td className="whitespace-nowrap">
-              <div className="flex gap-1">
-                <button onClick={e => { e.stopPropagation(); navigate(`/admin/clients/${c.id}`); }} className="btn btn-secondary btn-xs p-1.5" title="View">
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+            <Td>
+              <div className="flex flex-col">
+                <span className="text-white font-600">{c.email}</span>
+                <span className="text-[11px] text-[#8a94a6] font-700 mt-0.5">{c.phone}</span>
+              </div>
+            </Td>
+            <Td>
+              <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-900 uppercase tracking-widest ${c.type === 'Portal' ? 'bg-[#0057c7]/10 text-[#38bdf8] border border-[#0057c7]/20' : 'bg-white/5 text-[#8a94a6] border border-white/10'}`}>
+                {c.type}
+              </span>
+            </Td>
+            <Td>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white font-900 text-[13px] border border-white/5">{c.cases}</div>
+                <span className="text-[10px] text-[#8a94a6] font-900 uppercase tracking-widest">Matters</span>
+              </div>
+            </Td>
+            <Td><Badge status={c.status} /></Td>
+            <Td className="text-[#8a94a6] font-800 text-[11px] uppercase tracking-wider">{c.joined}</Td>
+            <Td>
+              <div className="flex gap-2 justify-end pr-2">
+                <button onClick={e => { e.stopPropagation(); navigate(`/admin/clients/${c.id}`); }} 
+                  className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/5 border border-white/5 text-[#8a94a6] hover:bg-[#0057c7] hover:text-white transition-all group/btn shadow-lg" 
+                  title="View Client">
+                  <svg className="w-4 h-4 transition-transform group-hover/btn:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                 </button>
-                <button onClick={e => { e.stopPropagation(); openModal('edit-client', c.raw); }} className="btn btn-secondary btn-xs p-1.5" title="Edit">
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                <button onClick={e => { e.stopPropagation(); openModal('edit-client', c.raw); }} 
+                  className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/5 border border-white/5 text-[#8a94a6] hover:bg-[#f59e0b] hover:text-white transition-all group/btn shadow-lg" 
+                  title="Edit Client">
+                  <svg className="w-4 h-4 transition-transform group-hover/btn:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 00 2 2h14a2 2 0 00 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                 </button>
               </div>
             </Td>
           </Tr>
         ))}
       </Table>
-      <div className="flex items-center justify-between text-[12px] text-slate-500 gap-2 flex-wrap">
-        <span>Showing {filtered.length} of {clients.length} clients</span>
+      <div className="flex items-center justify-between px-2">
+        <span className="text-[12px] text-[#8a94a6] font-bold uppercase tracking-widest">Displaying {filtered.length} of {clients.length} Professional Records</span>
       </div>
     </div>
   );
@@ -405,7 +487,7 @@ export function ClientsPage({ navigate, toast, openModal }) {
 // ─────────────────────────────────────────────────────────
 //  CLIENT DETAIL PAGE
 // ─────────────────────────────────────────────────────────
-export function ClientDetailPage({ clientId, navigate, toast, openModal }) {
+export function ClientDetailPage({ clientId, navigate, toast, openModal, role = 'admin' }) {
   const [tab, setTab] = useState('Overview');
   const [client, setClient] = useState(null);
   const [invoices, setInvoices] = useState([]);
@@ -489,7 +571,7 @@ export function ClientDetailPage({ clientId, navigate, toast, openModal }) {
   if (error || !client) {
     return (
       <div className="animate-fade-in space-y-4">
-        <button onClick={() => navigate('/admin/clients')} className="btn btn-secondary btn-xs">Back to Clients</button>
+        <button onClick={() => navigate(role === 'lawyer' ? '/lawyer/clients' : '/admin/clients')} className="btn btn-secondary btn-xs">Back to Clients</button>
         <Card className="border-red-200 bg-red-50/50">
           <p className="text-[13px] text-red-800 font-600">{error || 'Client not found'}</p>
         </Card>
@@ -516,41 +598,83 @@ export function ClientDetailPage({ clientId, navigate, toast, openModal }) {
   const pendingInv = invoices.filter((i) => (i.outstanding || 0) > 0 && i.status !== 'void').length;
 
   return (
-    <div className="animate-fade-in space-y-4">
-      <button onClick={() => navigate('/admin/clients')} className="btn btn-secondary btn-xs">
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><polyline points="15 18 9 12 15 6" /></svg>
-        Back to Clients
-      </button>
+    <div className="animate-fade-in space-y-6">
+      <div className="flex items-center justify-between">
+        <button onClick={() => navigate(role === 'lawyer' ? '/lawyer/clients' : '/admin/clients')} className="btn btn-secondary h-9 px-3 flex items-center gap-2 group transition-all">
+          <svg className="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M15 18l-6-6 6-6" /></svg>
+          <span className="text-[12px] font-700 uppercase tracking-widest">Back to Registry</span>
+        </button>
+      </div>
 
-      <Card>
-        <div className="flex items-start gap-4 flex-wrap">
-          <Avatar initials={view.avatar} size="xl" />
-          <div className="flex-1">
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <h2 className="text-xl font-700 text-slate-900 font-display">{view.name}</h2>
-              <Badge status={view.status} />
-              <span className="text-[11px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-500">{view.type}</span>
+      <Card className="relative overflow-hidden">
+        {/* Background Accent */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary-600/5 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="flex items-start gap-5 flex-wrap relative z-10">
+          <Avatar initials={view.avatar} size="xl" color="#0057c7" />
+          <div className="flex-1 min-w-[200px]">
+            <div className="flex items-center gap-3 flex-wrap mb-2">
+              <h2 className="text-2xl font-800 text-white font-display tracking-tight">{view.name}</h2>
+              <div className="flex gap-2">
+                <Badge status={view.status} />
+                <span className="text-[11px] bg-[#0057c7]/10 text-[#38bdf8] border border-[#0057c7]/20 px-2.5 py-0.5 rounded-full font-800 uppercase tracking-widest">{view.type}</span>
+              </div>
             </div>
-            <p className="text-[12px] text-slate-500 mb-2">{view.id} · Joined {view.joined}</p>
-            <div className="flex flex-wrap gap-4 text-[13px] text-slate-600">
-              <span>📧 {view.email}</span>
-              <span>📞 {view.phone}</span>
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-[13px] font-medium text-[#8a94a6]">
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-[#0057c7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" /></svg>
+                {view.id}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-[#0057c7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                Enrolled {view.joined}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-[#0057c7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                {view.email}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-[#0057c7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                {view.phone}
+              </span>
             </div>
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <button onClick={() => openModal('compose-email', firstMatterId ? { matterId: firstMatterId } : {})} className="btn btn-secondary btn-xs">Send Email</button>
-            <button onClick={() => openModal('edit-client', client)} className="btn btn-primary btn-xs">Edit Client</button>
+          <div className="flex gap-2.5 flex-wrap">
+            <button onClick={() => openModal('compose-email', firstMatterId ? { matterId: firstMatterId } : {})} className="btn btn-secondary h-10 px-4">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              Send Email
+            </button>
+            <button onClick={() => openModal('edit-client', client)} className="btn btn-primary h-10 px-6">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 00 2 2h11a2 2 0 00 2-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+              Edit Client
+            </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-4 border-t border-slate-100">
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 pt-6 border-t border-white/5">
           {[
-            { label: 'Active Matters', value: activeMatters },
-            { label: 'Documents', value: documents.length },
-            { label: 'Pending Bills', value: pendingInv },
+            { 
+              label: 'Active Matters', 
+              value: activeMatters, 
+              icon: <svg className="w-6 h-6 text-[#38bdf8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg> 
+            },
+            { 
+              label: 'Documents Vault', 
+              value: documents.length, 
+              icon: <svg className="w-6 h-6 text-[#10b981]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> 
+            },
+            { 
+              label: 'Pending Items', 
+              value: pendingInv, 
+              icon: <svg className="w-6 h-6 text-[#f59e0b]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> 
+            },
           ].map((s) => (
-            <div key={s.label} className="text-center">
-              <p className="text-xl font-700 text-primary-600">{s.value}</p>
-              <p className="text-[11px] text-slate-500">{s.label}</p>
+            <div key={s.label} className="flex flex-col items-center p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all group">
+              <div className="mb-2 p-2 rounded-xl bg-white/5 group-hover:scale-110 transition-transform">
+                {s.icon}
+              </div>
+              <p className="text-3xl font-800 text-white font-display mb-1">{s.value}</p>
+              <p className="text-[11px] text-[#8a94a6] font-800 uppercase tracking-[0.15em]">{s.label}</p>
             </div>
           ))}
         </div>
@@ -559,26 +683,45 @@ export function ClientDetailPage({ clientId, navigate, toast, openModal }) {
       <Tabs tabs={['Overview', 'Matters', 'Documents', 'Billing', 'Notes']} active={tab} onChange={setTab} />
 
       {tab === 'Overview' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
           <Card>
-            <h3 className="text-[13px] font-600 text-slate-900 mb-3">Contact Details</h3>
-            {[
-              ['Full Name', view.name],
-              ['Email', view.email],
-              ['Phone', view.phone],
-              ['Type', view.type],
-              ['Client ID', view.id],
-              ['Joined', view.joined],
-            ].map(([k, v]) => (
-              <div key={k} className="flex justify-between py-2 border-b border-slate-50 last:border-0 text-[13px]">
-                <span className="text-slate-500">{k}</span><span className="font-500 text-slate-800">{v}</span>
-              </div>
-            ))}
+            <h3 className="text-[14px] font-800 text-white uppercase tracking-[0.15em] mb-6 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0057c7]"></span>
+              Contact Identity
+            </h3>
+            <div className="space-y-1">
+              {[
+                ['Full Name', view.name],
+                ['Email Address', view.email],
+                ['Contact Number', view.phone],
+                ['Client Classification', view.type],
+                ['System Identifier', `C${view.id.padStart(4, '0')}`],
+                ['Enrollment Date', view.joined],
+              ].map(([k, v]) => (
+                <div key={k} className="flex justify-between items-center py-3.5 border-b border-white/5 last:border-0 group">
+                  <span className="text-[13px] font-700 text-[#b8c2d1] uppercase tracking-wider">{k}</span>
+                  <span className="text-[14px] font-600 text-white group-hover:text-[#38bdf8] transition-colors">{v}</span>
+                </div>
+              ))}
+            </div>
           </Card>
-          <Card>
-            <h3 className="text-[13px] font-600 text-slate-900 mb-3">Notes</h3>
-            <Textarea rows={5} value={notes} onChange={(e) => setNotes(e.target.value)} />
-            <button type="button" onClick={saveNotes} className="btn btn-primary mt-3 w-full justify-center">Save Notes</button>
+          <Card className="flex flex-col">
+            <h3 className="text-[14px] font-800 text-white uppercase tracking-[0.15em] mb-6 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]"></span>
+              Internal Case Notes
+            </h3>
+            <div className="flex-1 min-h-[180px]">
+              <Textarea 
+                className="h-full min-h-[180px] text-[14px] leading-relaxed" 
+                value={notes} 
+                onChange={(e) => setNotes(e.target.value)} 
+                placeholder="Enter confidential client notes here..."
+              />
+            </div>
+            <button type="button" onClick={saveNotes} className="btn btn-primary mt-5 w-full justify-center h-11">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M5 13l4 4L19 7" /></svg>
+              Save Notes
+            </button>
           </Card>
         </div>
       )}
@@ -587,15 +730,15 @@ export function ClientDetailPage({ clientId, navigate, toast, openModal }) {
           <Table headers={['Matter ID', 'Title', 'Type', 'Status', 'Next Hearing']}>
             {matters.map((c) => (
               <Tr key={c.id} onClick={() => navigate(`/admin/matters/${c.id}`)}>
-                <Td><span className="font-mono text-[12px] text-primary-600">{c.matter_number}</span></Td>
-                <Td className="font-500 text-slate-900">{c.title}</Td>
-                <Td><span className="text-[12px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">{c.matter_type || c.practice_area}</span></Td>
+                <Td><span className="font-mono text-[12px] text-[#38bdf8] font-900 tracking-wider uppercase">{c.matter_number}</span></Td>
+                <Td className="font-700 text-white group-hover:text-[#38bdf8] transition-colors">{c.title}</Td>
+                <Td><span className="text-[11px] font-800 uppercase tracking-widest bg-white/5 text-[#8a94a6] px-2.5 py-1 rounded-xl border border-white/5">{c.matter_type || c.practice_area}</span></Td>
                 <Td><Badge status={matterStatusForBadge(c.status)} /></Td>
-                <Td className="text-slate-500 text-[12px]">{c.next_hearing ? new Date(c.next_hearing).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</Td>
+                <Td className="text-[#8a94a6] font-800 text-[11px] uppercase tracking-wider">{c.next_hearing ? new Date(c.next_hearing).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</Td>
               </Tr>
             ))}
           </Table>
-        ) : <EmptyState icon="📁" title="No matters found" desc="No matters assigned to this client yet." />
+        ) : <EmptyState icon={<svg className="w-12 h-12 text-[#8a94a6] opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>} title="No matters found" desc="No matters assigned to this client yet." />
       )}
       {tab === 'Documents' && (
         documents.length > 0 ? (
@@ -604,8 +747,8 @@ export function ClientDetailPage({ clientId, navigate, toast, openModal }) {
               <Card key={d.id} className="hover:shadow-md cursor-pointer group" noPad>
                 <div className="p-3">
                   <FileIcon type={mimeToType(d.mime_type)} />
-                  <p className="text-[12px] font-500 text-slate-800 mt-2 line-clamp-2 group-hover:text-primary-600">{d.original_name}</p>
-                  <p className="text-[11px] text-slate-400 mt-1">{d.file_size} bytes · {new Date(d.created_at).toLocaleDateString()}</p>
+                  <p className="text-[12px] font-800 text-white mt-2 line-clamp-2 group-hover:text-[#38bdf8] transition-colors tracking-tight">{d.original_name}</p>
+                  <p className="text-[10px] text-[#8a94a6] mt-1 font-800 uppercase tracking-widest">{d.file_size} bytes · {new Date(d.created_at).toLocaleDateString()}</p>
                   <button
                     type="button"
                     onClick={async () => {
@@ -624,27 +767,30 @@ export function ClientDetailPage({ clientId, navigate, toast, openModal }) {
               </Card>
             ))}
           </div>
-        ) : <EmptyState icon="📂" title="No documents" desc="Documents will appear here when uploaded." />
+        ) : <EmptyState icon={<svg className="w-12 h-12 text-[#8a94a6] opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>} title="No documents" desc="Documents will appear here when uploaded." />
       )}
       {tab === 'Billing' && (
         invoices.length > 0 ? (
           <Table headers={['Invoice', 'Description', 'Amount', 'Due', 'Status']}>
             {invoices.map((inv) => (
               <Tr key={inv.id}>
-                <Td><span className="font-mono text-[12px]">{inv.invoice_number}</span></Td>
-                <Td className="text-[12px] text-slate-500 max-w-[200px] truncate">{inv.description || '—'}</Td>
-                <Td className="font-600">{formatMoney(inv.amount)}</Td>
-                <Td className="text-slate-500 text-[12px]">{inv.due_date ? new Date(inv.due_date).toLocaleDateString() : '—'}</Td>
+                <Td><span className="font-mono text-[12px] text-[#38bdf8] font-900 tracking-wider uppercase">{inv.invoice_number}</span></Td>
+                <Td className="text-[12px] text-[#8a94a6] font-600 max-w-[200px] truncate">{inv.description || '—'}</Td>
+                <Td className="font-900 text-white tracking-tighter text-[15px]">{formatMoney(inv.amount)}</Td>
+                <Td className="text-[#8a94a6] font-800 text-[11px] uppercase tracking-wider">{inv.due_date ? new Date(inv.due_date).toLocaleDateString() : '—'}</Td>
                 <Td><Badge status={inv.status} /></Td>
               </Tr>
             ))}
           </Table>
-        ) : <EmptyState icon="🧾" title="No invoices" desc="Invoices linked to this client’s matters will appear here." />
+        ) : <EmptyState icon={<svg className="w-12 h-12 text-[#8a94a6] opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>} title="No invoices" desc="Invoices linked to this client’s matters will appear here." />
       )}
       {tab === 'Notes' && (
         <Card>
-          <h3 className="text-[13px] font-600 text-slate-900 mb-3">Client notes</h3>
-          <p className="text-[12px] text-slate-500 mb-3">Use the Overview tab to edit and save firm notes for this client.</p>
+          <h3 className="text-[15px] font-800 text-white uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#0057c7]" />
+            Client Activity Journal
+          </h3>
+          <p className="text-[12px] text-[#8a94a6] mb-4 font-600 italic">Use the Overview tab to edit and save firm notes for this client.</p>
           <Textarea rows={5} value={notes} onChange={(e) => setNotes(e.target.value)} />
           <button type="button" onClick={saveNotes} className="btn btn-primary mt-2">Save Notes</button>
         </Card>
@@ -736,24 +882,48 @@ export function CasesPage({ navigate, toast, openModal }) {
       <Table headers={['Matter ID', 'Title', 'Client', 'Lawyer', 'Type', 'Status', 'Next Hearing', 'Priority', '']}
         searchPlaceholder="Search matters..." onSearch={setSearch}
         actions={
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="btn btn-secondary text-[12px]">
-            <option>All Status</option><option>Active</option><option>Pending</option><option>Closed</option>
-          </select>
+          <Select 
+            value={statusFilter} 
+            onChange={e => setStatusFilter(e.target.value)} 
+            className="h-9 min-w-[140px] !py-0 !px-3 text-[12px] rounded-xl"
+          >
+            <option value="All Status">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Pending">Pending</option>
+            <option value="Closed">Closed</option>
+          </Select>
         }>
         {filtered.map(c => (
-          <Tr key={c.id}>
-            <Td className="whitespace-nowrap"><span className="font-mono text-[12px] text-primary-600 font-500">{c.matterNumber}</span></Td>
-            <Td className="whitespace-nowrap"><p className="font-500 text-slate-900 hover:text-primary-600 truncate max-w-[180px]">{c.title}</p></Td>
-            <Td className="text-[12px] whitespace-nowrap">{c.client}</Td>
-            <Td className="text-[12px] whitespace-nowrap">{c.lawyer}</Td>
-            <Td className="whitespace-nowrap"><span className="text-[11px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-500">{c.type}</span></Td>
+          <Tr key={c.id} onClick={() => navigate(`/admin/matters/${c.id}`)}>
+            <Td className="whitespace-nowrap">
+              <span className="font-mono text-[12px] text-[#38bdf8] font-bold uppercase tracking-wider">{c.matterNumber}</span>
+            </Td>
+            <Td className="whitespace-nowrap">
+              <p className="font-700 text-white group-hover:text-[#38bdf8] transition-colors truncate max-w-[200px]">{c.title}</p>
+            </Td>
+            <Td className="whitespace-nowrap">
+              <span className="text-[13px] font-600 text-[#b8c2d1]">{c.client}</span>
+            </Td>
+            <Td className="whitespace-nowrap">
+              <span className="text-[12px] font-medium text-[#8a94a6]">{c.lawyer}</span>
+            </Td>
+            <Td className="whitespace-nowrap">
+              <span className="text-[11px] bg-[#0057c7]/10 text-[#38bdf8] border border-[#0057c7]/20 px-2 py-0.5 rounded-full font-800 uppercase tracking-widest">{c.type}</span>
+            </Td>
             <Td className="whitespace-nowrap"><Badge status={c.status} /></Td>
-            <Td className="text-slate-500 text-[12px] whitespace-nowrap">{c.nextHearing}</Td>
+            <Td className="whitespace-nowrap">
+              <span className="text-[12px] font-bold text-[#8a94a6]">{c.nextHearing}</span>
+            </Td>
             <Td className="whitespace-nowrap"><Badge status={c.priority} /></Td>
             <Td className="whitespace-nowrap">
-              <button onClick={e => { e.stopPropagation(); navigate(`/admin/matters/${c.id}`); }} className="btn btn-secondary p-1.5" title="View">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-              </button>
+              <div className="flex justify-end pr-1">
+                <button 
+                  onClick={e => { e.stopPropagation(); navigate(`/admin/matters/${c.id}`); }} 
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 border border-white/5 text-[#8a94a6] hover:bg-[#0057c7] hover:text-white transition-all group/btn" 
+                  title="View Matter">
+                  <svg className="w-4 h-4 transition-transform group-hover/btn:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                </button>
+              </div>
             </Td>
           </Tr>
         ))}
@@ -1326,7 +1496,13 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
         user: c.sender?.full_name || '—',
         text: body.slice(0, 280),
         date: new Date(c.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
-        icon: c.communication_type === 'email_log' ? '✉️' : c.communication_type === 'call_log' ? '📞' : c.communication_type === 'meeting_log' ? '🤝' : '💬',
+        icon: c.communication_type === 'email_log' 
+          ? <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+          : c.communication_type === 'call_log' 
+            ? <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+            : c.communication_type === 'meeting_log' 
+              ? <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+              : <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>,
         visibility: c.visibility,
       };
     })
@@ -1410,92 +1586,119 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
     <div className="animate-fade-in space-y-6">
       {/* Navigation & Actions */}
       <div className="flex items-center justify-between pb-2 gap-3 flex-wrap">
-        <button onClick={() => navigate(isClient ? '/client/matters' : role === 'lawyer' ? '/lawyer/matters' : '/admin/matters')} className="group flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-all font-500 text-[13px]">
-          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-all">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><polyline points="15 18 9 12 15 6" /></svg>
-          </div>
-          Back to Matters
+        <button onClick={() => navigate(isClient ? '/client/matters' : role === 'lawyer' ? '/lawyer/matters' : '/admin/matters')} 
+          className="btn btn-secondary h-9 px-3 flex items-center gap-2 group transition-all">
+          <svg className="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M15 18l-6-6 6-6" /></svg>
+          <span className="text-[12px] font-700 uppercase tracking-widest">Back to Matters</span>
         </button>
         {!isClient && (
-          <div className="flex gap-2 flex-wrap w-full sm:w-auto">
-
-            <button onClick={() => openModal('add-document', matterModalContext)} className="btn btn-secondary btn-sm h-9 px-4">Upload File</button>
-            <button onClick={() => openModal('add-note', matterModalContext)} className="btn btn-primary btn-sm h-9 px-4">+ New Note</button>
+          <div className="flex gap-2.5 flex-wrap w-full sm:w-auto">
+            <button onClick={() => openModal('add-document', matterModalContext)} className="btn btn-secondary h-9 px-4 text-[12px] font-700 uppercase tracking-wider">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+              Upload File
+            </button>
+            <button onClick={() => openModal('add-note', matterModalContext)} className="btn btn-primary h-9 px-4 text-[12px] font-700 uppercase tracking-wider">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M12 4v16m8-8H4" /></svg>
+              New Note
+            </button>
           </div>
         )}
       </div>
 
       {/* Matter Header */}
-      <header className="bg-white p-6 rounded-[1.25rem] border border-slate-100 shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-2 h-full bg-primary-600" />
-        <div className={`flex justify-between items-start gap-6 flex-wrap ${isClient ? 'items-center' : ''}`}>
-          <div className="flex-1 min-w-[280px]">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="font-mono text-[11px] bg-primary-50 text-primary-700 px-2.5 py-1 rounded-lg font-700 uppercase tracking-wider">{currentCase.id}</span>
+      <header className="relative bg-white/[0.03] p-8 rounded-[1.5rem] border border-white/5 shadow-2xl overflow-hidden backdrop-blur-sm">
+        <div className="absolute top-0 left-0 w-1.5 h-full bg-[#0057c7]" />
+        {/* Background Accent */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#0057c7]/5 rounded-full blur-3xl pointer-events-none -mr-32 -mt-32" />
+        
+        <div className={`relative z-10 flex justify-between items-start gap-8 flex-wrap ${isClient ? 'items-center' : ''}`}>
+          <div className="flex-1 min-w-[300px]">
+            <div className="flex items-center gap-3 mb-4 flex-wrap">
+              <span className="font-mono text-[12px] bg-[#38bdf8]/10 text-[#38bdf8] border border-[#38bdf8]/20 px-3 py-1 rounded-xl font-800 uppercase tracking-widest shadow-sm">{currentCase.id}</span>
               <Badge status={currentCase.status} />
               <Badge status={currentCase.priority} />
               {activeTimer && activeTimer.matter_id === Number(caseId) && (
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 border border-red-100 animate-pulse">
-                  <div className="w-1.5 h-1.5 rounded-full bg-red-600" />
-                  <span className="text-[10px] font-900 text-red-600 uppercase tracking-widest">Recording Time</span>
+                <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-red-500/10 border border-red-500/20 animate-pulse">
+                  <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+                  <span className="text-[10px] font-900 text-red-500 uppercase tracking-[0.15em]">Live Session</span>
                 </div>
               )}
             </div>
-            <h1 className="text-3xl font-800 text-slate-900 font-display mb-2">{currentCase.title}</h1>
-            <div className="flex flex-wrap gap-x-6 gap-y-2 text-[13px] text-slate-500 font-500">
-              <span className="flex items-center gap-1.5"><span className="text-[16px]">👤</span> {currentCase.client}</span>
-              <span className="flex items-center gap-1.5"><span className="text-[16px]">📋</span> {currentCase.type}</span>
-              <span className="flex items-center gap-1.5"><span className="text-[16px]">⚖️</span> {currentCase.lawyer}</span>
-              <span className="flex items-center gap-1.5"><span className="text-[16px]">📅</span> Opened: {currentCase.filed}</span>
+            <h1 className="text-4xl font-800 text-white font-display mb-4 tracking-tight leading-tight">{currentCase.title}</h1>
+            <div className="flex flex-wrap gap-x-8 gap-y-3 text-[13px] font-600 text-[#8a94a6]">
+              <span className="flex items-center gap-2">
+                <span className="text-[#0057c7]">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                </span>
+                <span className="text-white">{currentCase.client}</span>
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="text-[#0057c7]">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
+                </span>
+                <span className="text-white">{currentCase.type}</span>
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="text-[#0057c7]">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>
+                </span>
+                <span className="text-white">{currentCase.lawyer}</span>
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="text-[#0057c7]">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 00-2 2z" /></svg>
+                </span>
+                <span className="text-white">Opened {currentCase.filed}</span>
+              </span>
             </div>
           </div>
           {!isClient && (
-            <div className="flex flex-col items-start sm:items-end gap-3 text-left sm:text-right w-full sm:w-auto">
-              <div>
-                <p className="text-[10px] text-slate-400 font-800 uppercase tracking-widest mb-1">
-                  {activeTimer && activeTimer.matter_id !== Number(caseId) ? 'Timer Running Elsewhere' : 'Matter Timer'}
+            <div className="flex flex-col items-start sm:items-end gap-4 text-left sm:text-right w-full sm:w-auto bg-white/[0.02] p-5 rounded-2xl border border-white/5 shadow-inner">
+              <div className="w-full sm:w-auto">
+                <p className="text-[10px] text-[#8a94a6] font-800 uppercase tracking-[0.2em] mb-2">
+                  {activeTimer && activeTimer.matter_id !== Number(caseId) ? 'System Occupied' : 'Session Duration'}
                 </p>
-                <div className="flex items-center gap-3">
-                  <p className="text-2xl font-mono font-800 text-primary-600">
+                <div className="flex items-center gap-4">
+                  <p className="text-3xl font-mono font-900 text-[#38bdf8] tabular-nums tracking-tight">
                     {activeTimer && activeTimer.matter_id === Number(caseId) ? formatTimer(timerSeconds) : '00:00:00'}
                   </p>
                   {activeTimer && activeTimer.matter_id === Number(caseId) ? (
-                    <button onClick={stopTimer} className="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors" title="Stop Timer">
-                      <span className="text-[12px]">■</span>
+                    <button onClick={stopTimer} className="w-10 h-10 flex items-center justify-center rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 transition-all shadow-lg shadow-red-500/10" title="End Session">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
                     </button>
                   ) : (
                     <button
                       onClick={startTimer}
                       disabled={activeTimer && activeTimer.matter_id !== Number(caseId)}
-                      className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${activeTimer && activeTimer.matter_id !== Number(caseId) ? 'bg-slate-50 text-slate-300 cursor-not-allowed' : 'bg-primary-50 text-primary-600 hover:bg-primary-100'}`}
-                      title={activeTimer && activeTimer.matter_id !== Number(caseId) ? 'Active timer on another matter' : 'Start Timer'}
+                      className={`w-10 h-10 flex items-center justify-center rounded-full border transition-all shadow-lg ${activeTimer && activeTimer.matter_id !== Number(caseId) ? 'bg-white/5 border-white/5 text-[#8a94a6] cursor-not-allowed opacity-50' : 'bg-[#0057c7]/10 border-[#0057c7]/20 text-[#38bdf8] hover:bg-[#0057c7] hover:text-white hover:border-transparent shadow-[#0057c7]/10'}`}
+                      title={activeTimer && activeTimer.matter_id !== Number(caseId) ? 'Active timer on another matter' : 'Start Session'}
                     >
-                      <span className="text-[12px]">▶</span>
+                      <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
                     </button>
                   )}
                 </div>
               </div>
-              <button onClick={handleEdit} className="btn btn-secondary btn-xs px-3 font-700 text-[11px]">Edit Details</button>
+              <button onClick={handleEdit} className="btn btn-secondary h-8 px-4 font-800 text-[10px] uppercase tracking-widest border-white/5 w-full sm:w-auto">Edit Matter Details</button>
             </div>
           )}
         </div>
       </header>
 
       {/* Summary Scorecards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {[
-          { label: 'Total Billed', value: formatUsd(billingTotals.total), icon: '📊', color: 'bg-indigo-50 text-indigo-600' },
-          { label: 'Outstanding', value: formatUsd(billingTotals.outstanding), icon: '💰', color: 'bg-primary-50 text-primary-600' },
-          { label: 'Documents', value: docs.length, icon: '📄', color: 'bg-blue-50 text-blue-600' },
-          { label: 'Next Deadline', value: nextDeadlineLabel, icon: '⏰', color: 'bg-red-50 text-red-600' },
-          { label: 'Recent Activity', value: recentActivityLabel, icon: '✨', color: 'bg-emerald-50 text-emerald-600' },
+          { label: 'Total Billed', value: formatUsd(billingTotals.total), icon: <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>, color: 'text-indigo-400 bg-indigo-500/10' },
+          { label: 'Outstanding', value: formatUsd(billingTotals.outstanding), icon: <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>, color: 'text-[#38bdf8] bg-[#0057c7]/10' },
+          { label: 'Documents Vault', value: docs.length, icon: <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>, color: 'text-blue-400 bg-blue-500/10' },
+          { label: 'Next Deadline', value: nextDeadlineLabel, icon: <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>, color: 'text-red-400 bg-red-500/10' },
+          { label: 'Recent Pulse', value: recentActivityLabel, icon: <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>, color: 'text-emerald-400 bg-emerald-500/10' },
         ].map((stat, i) => (
           (isClient && stat.label === 'Total Billed') ? null : (
-            <div key={i} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${stat.color}`}>{stat.icon}</div>
+            <div key={i} className="bg-white/[0.03] p-5 rounded-2xl border border-white/5 shadow-xl flex items-center gap-4 hover:bg-white/[0.05] transition-all group">
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-inner transition-transform group-hover:scale-110 ${stat.color}`}>{stat.icon}</div>
               <div>
-                <p className="text-[18px] font-800 text-slate-900 leading-none">{stat.value}</p>
-                <p className="text-[11px] text-slate-400 mt-1.5 font-700 uppercase tracking-wider">{stat.label}</p>
+                <p className="text-[20px] font-900 text-white leading-none tabular-nums">{stat.value}</p>
+                <p className="text-[10px] text-[#8a94a6] mt-2 font-800 uppercase tracking-[0.15em]">{stat.label}</p>
               </div>
             </div>
           )
@@ -1518,72 +1721,107 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
           />
 
           {isClient && (
-            <div className="animate-fade-in mb-6">
-              <div className="bg-gradient-to-r from-primary-600 to-accent-500 rounded-[1.5rem] p-6 text-white shadow-xl shadow-primary-500/20 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-                  <span className="text-9xl">📈</span>
-                </div>
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-                  <div>
-                    <h3 className="text-[13px] font-800 uppercase tracking-[0.2em] text-primary-200 mb-2">Matter Status</h3>
-                    <div className="flex items-center gap-4">
-                      <div className="bg-white/20 backdrop-blur-md px-4 py-2 rounded-xl border border-white/30">
-                        <span className="text-xl font-900 uppercase tracking-tighter">{currentCase.status}</span>
-                      </div>
-                      <p className="text-[15px] font-600 opacity-90 max-w-sm">
-                        {currentCase.status === 'active' ? "Your case is currently in active progress. Our team is working on the current phase." :
-                          currentCase.status === 'pending' ? "Your case is currently awaiting updates or required documentation." :
-                            "Your case has been successfully completed and finalized."}
+            <div className="animate-fade-in mb-8 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0057c7]/20 to-[#38bdf8]/10 rounded-[2rem] blur-2xl" />
+              <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col md:flex-row md:items-center justify-between gap-8 shadow-2xl">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="px-4 py-1.5 rounded-full bg-[#0057c7] text-white text-[11px] font-900 uppercase tracking-[0.2em] shadow-lg shadow-[#0057c7]/30">
+                      System Status
+                    </div>
+                    <div className="h-px w-12 bg-white/10" />
+                    <span className="text-[12px] font-800 text-[#38bdf8] uppercase tracking-widest animate-pulse">Live Tracking Active</span>
+                  </div>
+                  
+                  <div className="flex items-start gap-6">
+                    <div className="w-16 h-16 rounded-[1.5rem] bg-white/5 flex items-center justify-center text-3xl border border-white/10 shadow-inner">
+                      {currentCase.status === 'active' ? '⚡' : currentCase.status === 'pending' ? '⏳' : '✅'}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-900 text-white font-display tracking-tight mb-2">
+                        Case Status: <span className="text-[#38bdf8] uppercase">{currentCase.status}</span>
+                      </h3>
+                      <p className="text-[14px] text-[#8a94a6] font-600 leading-relaxed max-w-xl">
+                        {currentCase.status === 'active' ? "Your legal matter is in active progression. Our specialized counsel is executing the current phase of operations." :
+                          currentCase.status === 'pending' ? "The registry is currently awaiting critical updates or synchronized documentation from your end." :
+                            "Mission complete. Your legal matter has been successfully finalized and archived in the secure registry."}
                       </p>
                     </div>
                   </div>
+                </div>
+
+                <div className="flex flex-col items-center md:items-end gap-4">
+                  <p className="text-[10px] font-900 text-[#8a94a6] uppercase tracking-[0.2em]">Legal Task Force</p>
                   <div className="flex -space-x-3">
-                    <Avatar initials="AP" size="md" className="ring-4 ring-primary-600" />
-                    <Avatar initials="SL" size="md" className="ring-4 ring-primary-600" />
-                    <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-[11px] font-800 ring-4 ring-primary-600">+2</div>
+                    <Avatar initials="AP" size="md" color="#0057c7" className="ring-4 ring-[#1a2233]" />
+                    <Avatar initials="JD" size="md" color="#1e293b" className="ring-4 ring-[#1a2233]" />
+                    <Avatar initials="SM" size="md" color="#334155" className="ring-4 ring-[#1a2233]" />
+                    <div className="w-10 h-10 rounded-2xl bg-white/5 backdrop-blur-md flex items-center justify-center text-[11px] font-900 text-white ring-4 ring-[#1a2233] border border-white/10">+2</div>
                   </div>
+                  <button onClick={() => setTab('Messages')} className="mt-2 text-[11px] font-900 text-white bg-white/5 hover:bg-[#0057c7] px-6 py-2.5 rounded-xl border border-white/10 transition-all uppercase tracking-widest shadow-lg">
+                    Message Counsel
+                  </button>
                 </div>
               </div>
             </div>
           )}
 
-          {tab === 'Overview' && (
-            <div className="animate-fade-in space-y-4">
-              <Card>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-[15px] font-700 text-slate-900">Matter Summary</h3>
-                </div>
-                <p className="text-[14px] leading-relaxed text-slate-600 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100 italic">
-                  "{currentCase.description || 'No description provided for this matter.'}"
-                </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div>
-                    <h4 className="text-[11px] font-800 text-slate-400 uppercase tracking-widest mb-4">Core Information</h4>
+
+          {tab === 'Overview' && (
+            <div className="animate-fade-in space-y-6">
+              <Card className="relative overflow-hidden">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-[16px] font-800 text-white flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8]" />
+                    Matter Executive Summary
+                  </h3>
+                </div>
+                <div className="bg-white/[0.03] p-5 rounded-2xl border border-white/5 mb-8">
+                  <p className="text-[14px] leading-relaxed text-[#b8c2d1] italic">
+                    "{currentCase.description || 'No formal description recorded for this matter.'}"
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <div className="space-y-6">
+                    <h4 className="text-[10px] font-900 text-[#8a94a6] uppercase tracking-[0.2em] flex items-center gap-2">
+                      <span className="w-4 h-[1px] bg-[#8a94a6]/30" />
+                      Legal Infrastructure
+                    </h4>
                     <div className="space-y-4">
                       {[
-                        ['Filing Date', currentCase.filed],
-                        ['Opposing Party', currentCase.opposingParty || 'N/A'],
-                        ['Lead Counsel', currentCase.lawyer],
-                        ['Court Locality', isAdmin ? '—' : 'Superior Court of California'],
-                      ].map(([k, v]) => (
-                        <div key={k} className="flex justify-between text-[13px] border-b border-slate-50 pb-2">
-                          <span className="text-slate-500">{k}</span>
-                          <span className="font-600 text-slate-800">{v}</span>
+                        ['Filing Date', currentCase.filed, <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 00-2 2z" /></svg>],
+                        ['Opposing Party', currentCase.opposingParty || 'N/A', <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>],
+                        ['Lead Counsel', currentCase.lawyer, <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>],
+                        ['Court Locality', isAdmin ? '—' : 'Superior Court of California', <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" /></svg>],
+                      ].map(([k, v, icon]) => (
+                        <div key={k} className="flex justify-between items-center text-[13px] group border-b border-white/[0.03] pb-3 last:border-0">
+                          <span className="text-[#8a94a6] flex items-center gap-2">
+                            <span className="opacity-50 grayscale group-hover:grayscale-0 transition-all">{icon}</span>
+                            {k}
+                          </span>
+                          <span className="font-700 text-white">{v}</span>
                         </div>
                       ))}
                     </div>
                   </div>
-                  <div>
-                    <h4 className="text-[11px] font-800 text-slate-400 uppercase tracking-widest mb-4">Upcoming Benchmarks</h4>
+                  <div className="space-y-6">
+                    <h4 className="text-[10px] font-900 text-[#8a94a6] uppercase tracking-[0.2em] flex items-center gap-2">
+                      <span className="w-4 h-[1px] bg-[#8a94a6]/30" />
+                      Critical Benchmarks
+                    </h4>
                     <div className="space-y-3">
                       {overviewBenchmarks.map(b => (
-                        <div key={b.title} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                          <div>
-                            <p className="text-[13px] font-600 text-slate-800">{b.title}</p>
-                            <p className="text-[11px] text-slate-400">{b.date}</p>
+                        <div key={b.title} className="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all group">
+                          <div className="flex items-center gap-4">
+                            <div className={`w-2 h-2 rounded-full ${b.status === 'Overdue' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-[#0057c7]'}`} />
+                            <div>
+                              <p className="text-[13px] font-700 text-white group-hover:text-[#38bdf8] transition-colors">{b.title}</p>
+                              <p className="text-[11px] text-[#8a94a6] mt-0.5">{b.date}</p>
+                            </div>
                           </div>
-                          <span className={`text-[10px] font-700 px-2 py-0.5 rounded-full uppercase tracking-wider ${b.status === 'Imminent' || b.status === 'Overdue' ? 'bg-red-50 text-red-600' : 'bg-primary-50 text-primary-600'}`}>{b.status}</span>
+                          <span className={`text-[9px] font-900 px-2.5 py-1 rounded-lg uppercase tracking-widest border ${b.status === 'Imminent' || b.status === 'Overdue' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-[#0057c7]/10 text-[#38bdf8] border-[#0057c7]/20'}`}>{b.status}</span>
                         </div>
                       ))}
                     </div>
@@ -1591,65 +1829,71 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
                 </div>
               </Card>
 
-
-
               {/* Private Strategy Log - Hidden from clients */}
               {!isClient ? (
-                <Card className="bg-primary-900 text-white border-0">
-                  <h3 className="text-[13px] font-700 uppercase tracking-widest text-primary-300 mb-3">Internal Strategy Brief</h3>
-                  <p className="text-[14px] leading-relaxed opacity-90 italic">
+                <Card className="bg-[#0057c7]/10 border-[#0057c7]/20 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none transform translate-x-1/4 -translate-y-1/4">
+                    <svg className="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" /></svg>
+                  </div>
+                  <h3 className="text-[12px] font-900 uppercase tracking-[0.2em] text-[#38bdf8] mb-4 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                    High-Level Internal Strategy
+                  </h3>
+                  <p className="text-[15px] leading-relaxed text-white font-500 italic opacity-95">
                     {isAdmin && apiMatter
                       ? (apiMatter.description
                         ? `"${apiMatter.description}"`
-                        : 'No internal strategy brief recorded for this matter.')
-                      : '"Initial motion for summary judgment is ready. Focus on the testimony from the third-party inspector. Need to confirm the insurance limits for the adverse party before next mediation session."'}
+                        : 'No classified strategy brief recorded for this matter.')
+                      : '"Phase 2 discovery initiated. Focus remains on insurance indemnification clauses and expert witness preparation. Next mediation scheduled for month-end."'}
                   </p>
                 </Card>
               ) : (
-                <Card className="bg-primary-50 border-primary-100">
-                  <h3 className="text-[13px] font-700 uppercase tracking-widest text-primary-600 mb-3">Your Case Progress Brief</h3>
-                  <p className="text-[14px] leading-relaxed text-slate-700 font-500">
+                <Card className="bg-[#0057c7]/10 border-[#0057c7]/20">
+                  <h3 className="text-[12px] font-900 uppercase tracking-[0.2em] text-[#38bdf8] mb-4">Case Progression Brief</h3>
+                  <p className="text-[15px] leading-relaxed text-white font-500">
                     We are currently in the mid-litigation phase. Our team has finalized the initial filings and is now performing a deep-dive into the evidence provided. You will receive an update as soon as the court confirms the next session date.
                     <br /><br />
-                    <span className="font-700 text-primary-700">Next Action:</span> Final review of witness affidavits.
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-800 uppercase tracking-widest mt-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      Next Action: witness affidavit review
+                    </span>
                   </p>
                 </Card>
               )}
 
               {!isClient && (
-                <div className="mt-6 border-t border-slate-100 pt-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-[15px] font-700 text-slate-900 flex items-center gap-2">
-                      <span className="text-[18px]">⏱️</span> Time Tracking History
-                    </h3>
-                  </div>
+                <div className="mt-4">
+                  <h3 className="text-[15px] font-800 text-white flex items-center gap-2 mb-6">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8]" />
+                    Time Tracking History
+                  </h3>
                   {timerHistory.length === 0 ? (
-                    <div className="bg-slate-50/50 rounded-xl p-6 text-center border border-dashed border-slate-200">
-                      <p className="text-[12px] text-slate-400 italic">No time entries recorded for this matter.</p>
+                    <div className="bg-white/[0.02] rounded-2xl p-8 text-center border border-dashed border-white/10">
+                      <p className="text-[12px] text-[#8a94a6] italic">No active or historical time entries recorded for this matter.</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {timerHistory.map((t) => (
-                        <div key={t.id} className="bg-white border border-slate-100 rounded-xl p-3.5 flex items-center justify-between hover:border-primary-100 transition-colors shadow-sm relative overflow-hidden">
-                          {t.is_running && <div className="absolute top-0 left-0 w-1 h-full bg-primary-600" />}
-                          <div className="flex items-center gap-3">
-                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-[15px] ${t.is_running ? 'bg-primary-50 text-primary-600' : 'bg-slate-50 text-slate-400'}`}>
-                              {t.is_running ? '⌛' : '👤'}
+                        <div key={t.id} className="bg-white/[0.03] border border-white/5 rounded-2xl p-4 flex items-center justify-between hover:bg-white/[0.05] transition-all shadow-xl relative overflow-hidden group">
+                          {t.is_running && <div className="absolute top-0 left-0 w-1.5 h-full bg-[#38bdf8] shadow-[0_0_10px_rgba(56,189,248,0.5)]" />}
+                          <div className="flex items-center gap-4">
+                            <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl shadow-inner ${t.is_running ? 'bg-[#38bdf8]/10 text-[#38bdf8]' : 'bg-white/[0.03] text-[#8a94a6]'}`}>
+                              {t.is_running ? <svg className="w-5 h-5 animate-spin-slow" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> : <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>}
                             </div>
                             <div className="min-w-0">
-                              <p className="text-[12px] font-700 text-slate-800 truncate">{t.user?.full_name || 'Legal Staff'}</p>
-                              <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                                <span>{new Date(t.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                <span>→</span>
-                                <span>{t.end_time ? new Date(t.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Running'}</span>
-                              </p>
+                              <p className="text-[13px] font-800 text-white truncate tracking-tight">{t.user?.full_name || 'Legal Staff'}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-[11px] text-[#8a94a6] font-600 uppercase tracking-widest">{new Date(t.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                <span className="text-white/20">→</span>
+                                <span className="text-[11px] text-[#8a94a6] font-600 uppercase tracking-widest">{t.end_time ? new Date(t.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Live'}</span>
+                              </div>
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className={`text-[13px] font-800 ${t.is_running ? 'text-primary-600 animate-pulse' : 'text-slate-700'}`}>
-                              {t.duration_minutes ? (t.duration_minutes < 60 ? `${t.duration_minutes}m` : `${Math.floor(t.duration_minutes / 60)}h ${t.duration_minutes % 60}m`) : 'In Progress'}
+                            <p className={`text-[15px] font-900 tabular-nums ${t.is_running ? 'text-[#38bdf8] animate-pulse' : 'text-white'}`}>
+                              {t.duration_minutes ? (t.duration_minutes < 60 ? `${t.duration_minutes}m` : `${Math.floor(t.duration_minutes / 60)}h ${t.duration_minutes % 60}m`) : 'Active'}
                             </p>
-                            <p className="text-[10px] text-slate-400 font-700 uppercase tracking-widest mt-0.5">
+                            <p className="text-[9px] text-[#8a94a6] font-900 uppercase tracking-[0.2em] mt-1">
                               {new Date(t.start_time).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                             </p>
                           </div>
@@ -1664,7 +1908,7 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
 
           {tab === 'Documents' && (
             <div className="animate-fade-in space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 {[...new Set(['Complaint', 'Evidence', 'Contract', 'Court order', ...remoteFolders.map(f => f.name)])].map((folder) => (
                   <div
                     key={folder}
@@ -1678,49 +1922,56 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
                     }}
                     onClick={() => {
                       setDocumentsFolderFilter((prev) => (prev === folder ? null : folder));
-                      toast(`Opened folder ${folder}`, 'info');
                     }}
-                    className={`p-4 rounded-2xl border-2 bg-white transition-all cursor-pointer group ${documentsFolderFilter === folder
-                        ? 'border-primary-500 ring-2 ring-primary-200 bg-primary-50/30'
-                        : 'border-slate-50 hover:border-primary-200'
+                    className={`p-5 rounded-2xl border transition-all cursor-pointer group shadow-lg ${documentsFolderFilter === folder
+                        ? 'border-[#38bdf8] bg-[#0057c7]/10 ring-4 ring-[#0057c7]/20 shadow-[0_8px_30px_rgba(0,87,199,0.2)]'
+                        : 'border-white/5 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]'
                       }`}
                   >
-                    <span className="text-3xl mb-2 block group-hover:scale-110 transition-transform">📁</span>
-                    <p className={`text-[13px] font-700 leading-tight ${documentsFolderFilter === folder ? 'text-primary-800' : 'text-slate-800'}`}>{folder}</p>
-                    <p className="text-[11px] text-slate-400 mt-1">
-                      {docs.filter((d) => documentFolderBucket(d.category) === folder).length} files
-                    </p>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-4xl group-hover:scale-110 transition-transform text-[#38bdf8]">
+                        <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
+                      </span>
+                      <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white font-900 text-[13px] border border-white/10">
+                         {docs.filter((d) => documentFolderBucket(d.category) === folder).length}
+                      </div>
+                    </div>
+                    <p className={`text-[14px] font-800 leading-tight ${documentsFolderFilter === folder ? 'text-[#38bdf8]' : 'text-white'}`}>{folder}</p>
+                    <p className="text-[10px] text-[#8a94a6] mt-2 font-900 uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">Legal Repository</p>
                   </div>
                 ))}
               </div>
               <Card>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
                   <div>
-                    <h3 className="text-[15px] font-700 text-slate-900">Case Documents</h3>
+                    <h3 className="text-[16px] font-800 text-white flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8]" />
+                      Discovery Documents
+                    </h3>
                     {documentsFolderFilter && (
-                      <p className="text-[11px] text-slate-500 mt-1">Showing: {documentsFolderFilter} · click folder again to show all</p>
+                      <p className="text-[11px] text-[#38bdf8] mt-1 font-800 uppercase tracking-widest">Active Filter: {documentsFolderFilter} · click folder to reset</p>
                     )}
                   </div>
-                  <div className="flex gap-2 flex-wrap">
-                    {isClient && <button onClick={() => openModal('add-document', matterModalContext)} className="btn btn-primary btn-xs">Upload Document</button>}
+                  <div className="flex gap-3 flex-wrap">
+                    {isClient && <button onClick={() => openModal('add-document', matterModalContext)} className="btn btn-primary h-8 px-4 text-[11px] font-800 uppercase tracking-wider">Upload Object</button>}
                     <div className="relative">
-                      <input className="text-[12px] bg-slate-50 border border-slate-100 rounded-lg pl-8 pr-3 py-1.5 w-full sm:w-48 outline-none focus:ring-2 focus:ring-primary-100" placeholder="Search docs..." />
-                      <svg className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                      <input className="text-[13px] bg-white/[0.03] border border-white/10 rounded-xl pl-9 pr-4 py-2 w-full sm:w-64 outline-none focus:border-[#38bdf8] text-white transition-all" placeholder="Search objects..." />
+                      <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#8a94a6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                     </div>
                   </div>
                 </div>
-                <Table headers={['Document Name', 'Category', 'Uploaded By', 'Date', '']}>
+                <Table headers={['Document Identity', 'Category', 'Origin / Author', 'Date Logged', '']}>
                   {docsInFolder.map(d => (
                     <Tr key={d.id}>
                       <Td>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                           <FileIcon type={d.type} />
-                          <span className="text-[13px] font-600 text-slate-700 truncate max-w-[200px]">{d.name}</span>
+                          <span className="text-[14px] font-700 text-white truncate max-w-[240px] group-hover:text-[#38bdf8] transition-colors">{d.name}</span>
                         </div>
                       </Td>
-                      <Td><span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-600 tracking-wide uppercase">{d.category || 'General'}</span></Td>
-                      <Td className="text-slate-500 text-[12px]">{d.by}</Td>
-                      <Td className="text-slate-400 text-[11px]">{d.uploaded}</Td>
+                      <Td><span className="text-[10px] bg-white/5 text-[#8a94a6] px-2.5 py-1 rounded-xl border border-white/5 font-900 uppercase tracking-widest">{d.category || 'General'}</span></Td>
+                      <Td className="text-[#8a94a6] font-700 text-[12px]">{d.by}</Td>
+                      <Td className="text-[#8a94a6] font-800 text-[11px] uppercase tracking-wider">{d.uploaded}</Td>
                       <Td>
                         <button
                           onClick={async () => {
@@ -1731,9 +1982,9 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
                               toast(e.message || 'Download failed', 'error');
                             }
                           }}
-                          className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-primary-600 transition-colors"
+                          className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/5 border border-white/5 text-[#8a94a6] hover:bg-[#0057c7] hover:text-white transition-all shadow-lg group/btn"
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M7 16V4h10v12" /><path d="M20 12l-8 8-8-8" /></svg>
+                          <svg className="w-4 h-4 transition-transform group-hover/btn:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M7 16V4h10v12" /><path d="M20 12l-8 8-8-8" /></svg>
                         </button>
                       </Td>
                     </Tr>
@@ -1746,54 +1997,60 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
           {tab === 'Templates / Drafts' && (
             <div className="animate-fade-in">
               <Card>
-                <div className="flex items-start justify-between gap-3 mb-5 flex-wrap">
+                <div className="flex items-start justify-between gap-4 mb-8 flex-wrap">
                   <div>
-                    <h3 className="text-[15px] font-700 text-slate-900">Templates / Drafts</h3>
-                    <p className="text-[12px] text-slate-500 mt-1">Create, review, and manage draft documents for this matter.</p>
+                    <h3 className="text-[16px] font-800 text-white flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />
+                      Templates & Litigation Drafts
+                    </h3>
+                    <p className="text-[12px] text-[#8a94a6] mt-1 font-600">Automated legal document generation and signing pipeline.</p>
                   </div>
                   {!isClient && (
                     <div className="flex gap-2">
-                      <button onClick={() => openModal('browse-templates', { targetMatterId: caseId })} className="btn btn-secondary btn-sm">
+                      <button onClick={() => openModal('browse-templates', { targetMatterId: caseId })} className="btn btn-secondary h-9 px-4 text-[12px] font-700 uppercase tracking-wider">
                         Browse Library
                       </button>
-                      <button onClick={openCreateDraftModal} className="btn btn-primary btn-sm">
-                        Create New Draft
+                      <button onClick={openCreateDraftModal} className="btn btn-primary h-9 px-4 text-[12px] font-700 uppercase tracking-wider">
+                        Initialize Draft
                       </button>
                     </div>
                   )}
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {templatesDrafts.length > 0 ? templatesDrafts.map((item) => (
-                    <div key={item.id} className="p-4 rounded-2xl border border-slate-100 bg-white">
+                    <div key={item.id} className="p-6 rounded-2xl border border-white/5 bg-white/[0.03] hover:bg-white/[0.05] transition-all group shadow-2xl relative overflow-hidden">
+                      {/* Background Accent for draft status */}
+                      <div className={`absolute top-0 right-0 w-32 h-32 opacity-[0.02] pointer-events-none transform translate-x-1/2 -translate-y-1/2 rounded-full ${item.status === 'signed' ? 'bg-emerald-500' : 'bg-[#0057c7]'}`} />
+                      
                       {(() => {
                         const displayStatus = isClient ? clientStatus(item.status) : draftUiStatus(item.status);
                         return (
                           <>
-                            <div className="flex items-center justify-between gap-3 flex-wrap">
+                            <div className="flex items-center justify-between gap-4 flex-wrap relative z-10">
                               <div className="min-w-0">
-                                <p className="text-[14px] font-700 text-slate-900">{item.title}</p>
-                                <div className="flex items-center gap-2 mt-1.5 text-[11px] text-slate-500 flex-wrap">
-                                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-700 uppercase tracking-wider">{item.category}</span>
-                                  <span>Updated {item.updated}</span>
+                                <p className="text-[16px] font-900 text-white tracking-tight group-hover:text-[#38bdf8] transition-colors">{item.title}</p>
+                                <div className="flex items-center gap-3 mt-2 text-[11px] text-[#8a94a6] flex-wrap">
+                                  <span className="px-2.5 py-0.5 rounded-lg bg-white/[0.05] text-[#38bdf8] border border-white/5 font-900 uppercase tracking-widest">{item.category}</span>
+                                  <span className="font-800 uppercase tracking-[0.1em] opacity-60">Modified {item.updated}</span>
                                 </div>
                               </div>
-                              <span className={`text-[10px] font-800 px-2.5 py-1 rounded-full uppercase tracking-wider ${displayStatus === 'Draft'
-                                  ? 'bg-amber-50 text-amber-600'
+                              <span className={`text-[10px] font-900 px-3 py-1 rounded-lg uppercase tracking-[0.2em] border shadow-lg ${displayStatus === 'Draft'
+                                  ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                                   : displayStatus === 'Ready'
-                                    ? 'bg-blue-50 text-blue-600'
+                                    ? 'bg-[#0057c7]/10 text-[#38bdf8] border-[#0057c7]/20'
                                     : displayStatus === 'Sent for Signature' || displayStatus === 'Pending Signature'
-                                      ? 'bg-primary-50 text-primary-600'
-                                      : 'bg-emerald-50 text-emerald-600'
+                                      ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 shadow-indigo-500/10'
+                                      : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-emerald-500/10'
                                 }`}>
                                 {displayStatus}
                               </span>
                             </div>
-                            <div className="mt-4 flex gap-2 flex-wrap">
-                              <button onClick={() => openDraftPreview(item)} className="btn btn-secondary btn-xs">View Draft</button>
-                              {!isClient && <button onClick={() => openModal('use-template', { ...item, targetMatterId: caseId })} className="btn btn-primary btn-xs">Use Template</button>}
-                              {!isClient && <button onClick={() => sendTemplateForSignature(item.id)} className="btn btn-primary btn-xs">Send for Signature</button>}
+                            <div className="mt-6 flex gap-3 flex-wrap relative z-10">
+                              <button onClick={() => openDraftPreview(item)} className="btn btn-secondary h-8 px-5 text-[11px] font-800 uppercase tracking-widest">Preview</button>
+                              {!isClient && <button onClick={() => openModal('use-template', { ...item, targetMatterId: caseId })} className="btn btn-primary h-8 px-5 text-[11px] font-800 uppercase tracking-widest">Clone Draft</button>}
+                              {!isClient && item.status !== 'signed' && <button onClick={() => sendTemplateForSignature(item.id)} className="btn btn-primary h-8 px-5 text-[11px] font-800 uppercase tracking-widest border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white">Request Signature</button>}
                               {isClient && (item.status === 'sent_for_signature' || displayStatus === 'Pending Signature') && (
-                                <button onClick={() => openReviewAndSign(item)} className="btn btn-primary btn-xs">Review & Sign</button>
+                                <button onClick={() => openReviewAndSign(item)} className="btn btn-primary h-8 px-6 text-[11px] font-900 uppercase tracking-widest shadow-emerald-500/20">Review & Execute</button>
                               )}
                             </div>
                           </>
@@ -1802,14 +2059,14 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
                     </div>
                   )) : (
                     <EmptyState
-                      icon="📝"
-                      title="No drafts yet"
-                      desc="Create a new draft or select one from the template library to get started."
+                      icon={<svg className="w-12 h-12 text-[#8a94a6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>}
+                      title="Draft Registry Empty"
+                      desc="No legal drafts or templates have been initialized for this matter yet."
                       action={
                         !isClient && (
-                          <div className="flex gap-2">
-                            <button onClick={() => openModal('browse-templates', { targetMatterId: caseId })} className="btn btn-secondary btn-xs">Browse Library</button>
-                            <button onClick={openCreateDraftModal} className="btn btn-primary btn-xs">Create Draft</button>
+                          <div className="flex gap-3">
+                            <button onClick={() => openModal('browse-templates', { targetMatterId: caseId })} className="btn btn-secondary h-9 px-4 text-[11px] font-800 uppercase tracking-widest">Library Access</button>
+                            <button onClick={openCreateDraftModal} className="btn btn-primary h-9 px-4 text-[11px] font-800 uppercase tracking-widest">New Draft</button>
                           </div>
                         )
                       }
@@ -1822,11 +2079,14 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
 
           {(tab === 'Communications' || tab === 'Messages') && (
             <Card>
-              <div className="flex items-center justify-between mb-6 gap-2 flex-wrap">
-                <h3 className="text-[15px] font-700 text-slate-900">{isClient ? 'Portal Messages' : 'Communication History'}</h3>
-                <div className="flex gap-2 flex-wrap">
-                  {!isClient && <button onClick={() => openModal('log-call', matterModalContext)} className="btn btn-secondary btn-xs">Log Call</button>}
-                  <button className="btn btn-primary btn-xs" onClick={() => openModal('compose-email', matterModalContext)}>{isClient ? 'New Message' : 'Send Email'}</button>
+              <div className="flex items-center justify-between mb-8 gap-2 flex-wrap">
+                <h3 className="text-[16px] font-800 text-white flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8]" />
+                  {isClient ? 'Portal Messages' : 'Communication History'}
+                </h3>
+                <div className="flex gap-3 flex-wrap">
+                  {!isClient && <button onClick={() => openModal('log-call', matterModalContext)} className="btn btn-secondary h-8 px-5 text-[11px] font-800 uppercase tracking-widest">Log Call</button>}
+                  <button className="btn btn-primary h-8 px-5 text-[11px] font-800 uppercase tracking-widest" onClick={() => openModal('compose-email', matterModalContext)}>{isClient ? 'New Message' : 'Send Email'}</button>
                 </div>
               </div>
               <div className="space-y-4">
@@ -1834,20 +2094,20 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
                   .filter(c => c.communication_type !== 'note')
                   .filter(c => !isClient || c.visibility === 'client_visible' || c.visibility === 'client_shared')
                   .map((com, i) => (
-                    <div key={i} className="flex gap-4 p-4 rounded-xl border border-slate-50 bg-slate-50/20 hover:bg-white hover:shadow-md transition-all group">
-                      <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-lg flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <div key={i} className="flex gap-4 p-6 rounded-2xl border border-white/5 bg-white/[0.03] hover:bg-white/[0.05] transition-all group shadow-2xl">
+                      <div className="w-12 h-12 rounded-full bg-white/[0.05] shadow-inner flex items-center justify-center text-xl flex-shrink-0 group-hover:scale-110 transition-transform text-white border border-white/10">
                         {com.icon}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start mb-1">
-                          <h4 className="text-[13.5px] font-700 text-slate-900 truncate">{com.subject}</h4>
-                          <span className="text-[11px] text-slate-400 font-500 whitespace-nowrap">{com.date}</span>
+                          <h4 className="text-[15px] font-900 text-white truncate tracking-tight">{com.subject}</h4>
+                          <span className="text-[10px] text-[#8a94a6] font-900 uppercase tracking-widest whitespace-nowrap opacity-60">{com.date}</span>
                         </div>
-                        <p className="text-[12.5px] text-slate-500 mb-2">{com.text}</p>
+                        <p className="text-[13px] text-[#b8c2d1] mb-4 leading-relaxed font-500 opacity-90">{com.text}</p>
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[11px] bg-slate-100 text-slate-500 px-2.5 py-0.5 rounded-full font-700 uppercase tracking-widest">{com.type}</span>
-                            <span className="text-[11px] text-slate-400 font-500">· {com.user}</span>
+                          <div className="flex items-center gap-4">
+                            <span className="text-[10px] bg-[#0057c7]/10 text-[#38bdf8] border border-[#0057c7]/20 px-3 py-1 rounded-xl font-900 uppercase tracking-[0.15em]">{com.type}</span>
+                            <span className="text-[11px] text-[#8a94a6] font-700 uppercase tracking-widest opacity-60">· {com.user}</span>
                           </div>
                           {isClient && (
                             <button
@@ -1855,35 +2115,35 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
                                 setReplyingTo(com.id);
                                 setReplyText(`Replying to: ${com.text.slice(0, 50)}${com.text.length > 50 ? '...' : ''}\n\n`);
                               }}
-                              className="text-[11px] font-800 text-primary-600 hover:text-primary-800 uppercase tracking-widest"
+                              className="text-[11px] font-900 text-[#38bdf8] hover:text-white transition-colors uppercase tracking-[0.25em]"
                             >
                               Reply →
                             </button>
                           )}
                         </div>
                         {replyingTo === com.id && (
-                          <div className="mt-4 p-4 rounded-xl bg-white border border-primary-100 shadow-sm animate-slide-up">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-[10px] font-800 uppercase tracking-widest text-primary-600">Your Reply</span>
-                              <button onClick={() => setReplyingTo(null)} className="text-slate-400 hover:text-slate-600">
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" /></svg>
+                          <div className="mt-8 p-6 rounded-2xl bg-white/[0.03] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] animate-slide-up">
+                            <div className="flex items-center justify-between mb-5">
+                              <span className="text-[10px] font-900 uppercase tracking-[0.25em] text-[#38bdf8]">Secure Response Portal</span>
+                              <button onClick={() => setReplyingTo(null)} className="text-[#8a94a6] hover:text-white transition-colors">
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" /></svg>
                               </button>
                             </div>
                             <Textarea
                               value={replyText}
                               onChange={(e) => setReplyText(e.target.value)}
                               placeholder="Type your reply here..."
-                              rows={3}
-                              className="mb-3 text-[13px]"
+                              rows={5}
+                              className="mb-5 text-[14px] bg-white/[0.02] border-white/10 text-white rounded-xl focus:border-[#38bdf8] transition-all"
                             />
-                            <div className="flex justify-end gap-2">
-                              <button onClick={() => setReplyingTo(null)} className="btn btn-secondary btn-xs">Cancel</button>
+                            <div className="flex justify-end gap-3">
+                              <button onClick={() => setReplyingTo(null)} className="btn btn-secondary h-9 px-5 text-[11px] font-800 uppercase tracking-widest">Cancel</button>
                               <button
                                 onClick={handleSendReply}
                                 disabled={isSubmittingReply || !replyText.trim()}
-                                className="btn btn-primary btn-xs"
+                                className="btn btn-primary h-9 px-6 text-[11px] font-900 uppercase tracking-widest shadow-[#0057c7]/20"
                               >
-                                {isSubmittingReply ? 'Sending...' : 'Send Reply'}
+                                {isSubmittingReply ? 'Dispatching...' : 'Send Message'}
                               </button>
                             </div>
                           </div>
@@ -1899,36 +2159,33 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
             <div className="animate-fade-in space-y-6">
               {(role === 'lawyer' || role === 'admin') ? (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Status Control Card */}
                   <div className="lg:col-span-2 space-y-6">
                     <Card className="relative overflow-hidden group">
                       <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
-                        <span className="text-9xl">⚖️</span>
+                        <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" /></svg>
                       </div>
-
                       <div className="flex items-center justify-between mb-8">
                         <div>
-                          <p className="text-[11px] font-800 uppercase tracking-[0.2em] text-slate-400 mb-1">Matter Management</p>
-                          <h3 className="text-xl font-800 text-slate-900 font-display">Status & Workflow</h3>
+                          <p className="text-[10px] font-900 uppercase tracking-[0.25em] text-[#8a94a6] mb-1">Matter Management</p>
+                          <h3 className="text-xl font-900 text-white tracking-tight">Status & Workflow</h3>
                         </div>
                         <div className="text-right">
-                          <p className="text-[10px] text-slate-400 font-700 uppercase mb-1">Current Matter Status</p>
+                          <p className="text-[9px] text-[#8a94a6] font-900 uppercase tracking-[0.2em] mb-2">Current Matter Status</p>
                           <Badge status={currentCase.status} />
-                          <p className="text-[10px] text-slate-400 mt-1">Last updated: {statusHistory[0]?.date || '—'}</p>
                         </div>
                       </div>
 
-                      <div className="space-y-6">
+                      <div className="space-y-8">
                         <div>
-                          <label className="block text-[13px] font-700 text-slate-700 mb-4">Set New Matter Status</label>
-                          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 shadow-inner">
-                            <div className="flex items-center justify-between text-[12px] text-slate-500 mb-2">
-                              <span>Matter Progress</span>
-                              <span className="font-700 text-slate-600">{statusProgress}%</span>
+                          <label className="block text-[12px] font-900 text-white uppercase tracking-widest mb-6">Matter Progression Control</label>
+                          <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 shadow-inner">
+                            <div className="flex items-center justify-between text-[11px] text-[#8a94a6] mb-3 uppercase tracking-widest font-900">
+                              <span>Case Evolution</span>
+                              <span className="font-900 text-[#38bdf8]">{statusProgress}%</span>
                             </div>
-                            <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden mb-3">
+                            <div className="h-2 bg-white/[0.05] rounded-full overflow-hidden mb-6 shadow-inner">
                               <div
-                                className="h-full bg-primary-600 rounded-full transition-all duration-300"
+                                className="h-full bg-gradient-to-r from-[#0057c7] to-[#38bdf8] rounded-full transition-all duration-500 shadow-[0_0_15px_rgba(56,189,248,0.4)]"
                                 style={{ width: `${statusProgress}%` }}
                               />
                             </div>
@@ -1946,10 +2203,9 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
                                   handleStatusChange(nextStatus);
                                 }
                               }}
-                              className="w-full mb-3 accent-primary-600 cursor-pointer"
-                              aria-label="Matter progress slider"
+                              className="w-full mb-8 accent-[#38bdf8] cursor-pointer opacity-70 hover:opacity-100 transition-opacity"
                             />
-                            <div className="grid grid-cols-3 gap-2">
+                            <div className="grid grid-cols-3 gap-4">
                               {['active', 'pending', 'closed'].map((s) => {
                                 const isSelected = currentCase.status === s;
                                 return (
@@ -1959,61 +2215,37 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
                                       handleStatusChange(s);
                                       setStatusProgress(getProgressByStatus(s));
                                     }}
-                                    className={`py-2.5 px-2 sm:px-3 rounded-xl text-[12px] sm:text-[13px] font-700 transition-all duration-200 text-center whitespace-nowrap ${isSelected
-                                        ? 'bg-primary-600 text-white shadow-sm'
-                                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                    className={`py-3.5 px-3 rounded-xl text-[11px] font-900 uppercase tracking-[0.2em] transition-all duration-300 text-center ${isSelected
+                                        ? 'bg-gradient-to-br from-[#0057c7] to-[#38bdf8] text-white shadow-2xl scale-[1.05] border border-white/20'
+                                        : 'bg-white/[0.03] text-[#8a94a6] hover:bg-white/[0.05] border border-white/5'
                                       }`}
                                   >
-                                    {s === 'closed' ? 'Complete' : s.charAt(0).toUpperCase() + s.slice(1)}
+                                    {s === 'closed' ? 'Finalized' : s}
                                   </button>
                                 );
                               })}
                             </div>
                           </div>
                         </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-50">
-                          {[
-                            { label: 'Active', desc: 'Matter is currently in active litigation/negotiation.', color: 'emerald' },
-                            { label: 'Pending', desc: 'Awaiting review, documents, or opposing response.', color: 'amber' },
-                            { label: 'Complete', desc: 'Matter has been finalized and billing is reconciled.', color: 'slate' },
-                          ].map(item => (
-                            <div key={item.label} className="p-3">
-                              <p className={`text-[11px] font-800 text-${item.color}-600 underline decoration-2 underline-offset-4 mb-2`}>{item.label}</p>
-                              <p className="text-[11px] text-slate-400 leading-relaxed font-500">{item.desc}</p>
-                            </div>
-                          ))}
-                        </div>
                       </div>
                     </Card>
-
-                    <div className="bg-primary-50/50 rounded-[1.5rem] p-6 border border-primary-100/50">
-                      <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center text-white text-xl flex-shrink-0 shadow-lg shadow-primary-500/20">💡</div>
-                        <div>
-                          <h4 className="text-[14px] font-700 text-primary-900 mb-1">Lawyer Tip</h4>
-                          <p className="text-[12px] text-primary-700/70 leading-relaxed font-500">
-                            Keep the status updated to "Complete" once all trust account balances are zeroed and final orders have been served. This helps in firm-wide revenue forecasting.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
-
-                  {/* Status History Sidebar */}
                   <div className="space-y-4">
                     <Card>
-                      <h3 className="text-[13px] font-800 text-slate-900 uppercase tracking-widest mb-6">Status History</h3>
-                      <div className="space-y-6">
+                      <h3 className="text-[11px] font-900 text-white uppercase tracking-[0.3em] mb-8 flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8]" />
+                        Status Evolution
+                      </h3>
+                      <div className="space-y-8">
                         {statusHistory.map((h, i) => (
-                          <div key={i} className="relative pl-6 group">
-                            {i !== statusHistory.length - 1 && <div className="absolute left-[3px] top-[14px] bottom-[-22px] w-[1px] bg-slate-100 group-hover:bg-primary-200" />}
-                            <div className={`absolute left-0 top-[6px] w-[7px] h-[7px] rounded-full ring-4 ring-white shadow-sm ${i === 0 ? 'bg-primary-500' : 'bg-slate-300'}`} />
-                            <div className="space-y-1">
-                              <p className="text-[12px] font-700 text-slate-800">{h.to === 'closed' ? 'Complete' : h.to.charAt(0).toUpperCase() + h.to.slice(1)}</p>
-                              <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-600">
+                          <div key={i} className="relative pl-8 group">
+                            {i !== statusHistory.length - 1 && <div className="absolute left-[3px] top-[20px] bottom-[-35px] w-[1px] bg-white/5 group-hover:bg-[#38bdf8]/30 transition-colors" />}
+                            <div className={`absolute left-0 top-[6px] w-2 h-2 rounded-full ring-4 ring-slate-900 shadow-2xl ${i === 0 ? 'bg-[#38bdf8] shadow-[0_0_12px_rgba(56,189,248,0.6)]' : 'bg-white/20'}`} />
+                            <div className="space-y-2">
+                              <p className="text-[14px] font-900 text-white tracking-tight uppercase">{h.to === 'closed' ? 'Finalized' : h.to}</p>
+                              <div className="flex items-center gap-2 text-[10px] text-[#8a94a6] font-900 uppercase tracking-widest opacity-60">
                                 <span>{h.date}</span>
-                                <span className="w-1 h-1 rounded-full bg-slate-200" />
+                                <span className="w-1 h-1 rounded-full bg-white/20" />
                                 <span>By {h.by}</span>
                               </div>
                             </div>
@@ -2021,35 +2253,30 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
                         ))}
                       </div>
                     </Card>
-                    <div className="p-5 rounded-2xl border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-center py-8">
-                      <span className="text-2xl mb-2 opacity-30">🔔</span>
-                      <p className="text-[11px] font-700 text-slate-400 uppercase tracking-wider">Automated Notifications</p>
-                      <p className="text-[10px] text-slate-400 mt-1 max-w-[150px]">Status updates are reflected instantly in the connected client portal.</p>
-                    </div>
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                   {['Pending', 'In Progress', 'Completed', 'Overdue'].map(status => (
-                    <div key={status} className="space-y-3">
-                      <div className="flex items-center justify-between px-1">
-                        <h4 className="text-[11px] font-800 uppercase tracking-widest text-slate-500">{status}</h4>
-                        <span className="w-5 h-5 bg-slate-100 rounded-lg flex items-center justify-center text-[11px] font-800 text-slate-400">{tasks.filter(t => t.status === status).length}</span>
+                    <div key={status} className="space-y-5">
+                      <div className="flex items-center justify-between px-3">
+                        <h4 className="text-[11px] font-900 uppercase tracking-[0.25em] text-[#8a94a6]">{status}</h4>
+                        <span className="w-7 h-7 bg-white/[0.05] rounded-xl flex items-center justify-center text-[12px] font-900 text-white border border-white/10 shadow-inner">{tasks.filter(t => t.status === status).length}</span>
                       </div>
                       {tasks.filter(t => t.status === status).map(task => (
-                        <div key={task.id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:border-primary-300 cursor-pointer transition-all group">
-                          <div className="flex justify-between items-start mb-2">
-                            <span className={`text-[9px] font-900 px-2 py-0.5 rounded-full uppercase tracking-tighter ${task.priority === 'High' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'}`}>{task.priority}</span>
-                            <span className="text-[10px] text-slate-400 font-500">{task.due}</span>
+                        <div key={task.id} className="bg-white/[0.03] p-6 rounded-2xl border border-white/5 shadow-2xl hover:border-[#38bdf8]/40 cursor-pointer transition-all group relative overflow-hidden">
+                          <div className="flex justify-between items-start mb-4 relative z-10">
+                            <span className={`text-[9px] font-900 px-3 py-1 rounded-lg uppercase tracking-widest border shadow-lg ${task.priority === 'High' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-[#0057c7]/10 text-[#38bdf8] border-[#0057c7]/20'}`}>{task.priority}</span>
+                            <span className="text-[10px] text-[#8a94a6] font-800 uppercase tracking-widest opacity-60">{task.due}</span>
                           </div>
-                          <p className="text-[13px] font-700 text-slate-800 leading-tight group-hover:text-primary-600 transition-colors">{task.title}</p>
-                          <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-50">
-                            <span className="text-[11px] text-slate-400">{task.assignee}</span>
+                          <p className="text-[15px] font-900 text-white leading-snug group-hover:text-[#38bdf8] transition-colors relative z-10">{task.title}</p>
+                          <div className="flex items-center justify-between mt-5 pt-5 border-t border-white/5 relative z-10">
+                            <span className="text-[11px] text-[#8a94a6] font-800 uppercase tracking-widest opacity-60">{task.assignee}</span>
                             <Avatar initials={task.assignee.split(' ').map(n => n[0]).join('')} size="xs" />
                           </div>
                         </div>
                       ))}
-                      <button onClick={() => openModal('add-task')} className="w-full py-2.5 border-2 border-dashed border-slate-100 rounded-2xl text-[12px] text-slate-400 font-700 hover:bg-slate-50 hover:border-slate-300 transition-all">+ Add {status}</button>
+                      <button onClick={() => openModal('add-task')} className="w-full py-4 border-2 border-dashed border-white/5 rounded-2xl text-[11px] text-[#8a94a6] font-900 uppercase tracking-widest hover:bg-white/[0.04] hover:border-[#38bdf8]/40 hover:text-white transition-all shadow-inner">+ Add {status}</button>
                     </div>
                   ))}
                 </div>
@@ -2058,90 +2285,129 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
           )}
 
           {tab === 'Billing' && (
-            <div className="animate-fade-in space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                  <p className="text-[10px] text-slate-400 font-800 uppercase tracking-widest mb-1">Total Billed</p>
-                  <p className="text-2xl font-800 text-slate-900">{formatUsd(billingTotals.total)}</p>
+            <div className="animate-fade-in space-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 relative z-10">
+                <div className="bg-white/[0.02] backdrop-blur-xl border border-white/5 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden group">
+                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#0057c7]/5 rounded-full blur-3xl" />
+                  <p className="text-[10px] text-[#8a94a6] font-900 uppercase tracking-[0.3em] mb-4 opacity-70">Total Matter Billed</p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-[#0057c7]/10 flex items-center justify-center text-[#38bdf8] border border-[#0057c7]/20 shadow-inner">
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    </div>
+                    <p className="text-4xl font-900 text-white tabular-nums tracking-tighter">{formatUsd(billingTotals.total)}</p>
+                  </div>
                 </div>
-                <div className="bg-emerald-50/50 p-5 rounded-2xl border border-emerald-100 shadow-sm">
-                  <p className="text-[10px] text-emerald-500 font-800 uppercase tracking-widest mb-1">Paid to Date</p>
-                  <p className="text-2xl font-800 text-emerald-600">{formatUsd(billingTotals.paid)}</p>
+
+                <div className="bg-emerald-500/5 backdrop-blur-xl border border-emerald-500/10 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden group">
+                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl" />
+                  <p className="text-[10px] text-emerald-400 font-900 uppercase tracking-[0.3em] mb-4 opacity-70">Remittance Secured</p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-inner">
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <p className="text-4xl font-900 text-emerald-500 tabular-nums tracking-tighter">{formatUsd(billingTotals.paid)}</p>
+                  </div>
                 </div>
-                <div className="bg-red-50/50 p-5 rounded-2xl border border-red-100 shadow-sm">
-                  <p className="text-[10px] text-red-500 font-800 uppercase tracking-widest mb-1">Outstanding</p>
-                  <p className="text-2xl font-800 text-red-600">{formatUsd(billingTotals.outstanding)}</p>
+
+                <div className="bg-red-500/5 backdrop-blur-xl border border-red-500/10 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden group">
+                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-red-500/5 rounded-full blur-3xl" />
+                  <p className="text-[10px] text-red-400 font-900 uppercase tracking-[0.3em] mb-4 opacity-70">Current Arrears</p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20 shadow-inner">
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <p className="text-4xl font-900 text-red-500 tabular-nums tracking-tighter">{formatUsd(billingTotals.outstanding)}</p>
+                  </div>
                 </div>
               </div>
-              <Card>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-[15px] font-700 text-slate-900">{isClient ? 'Your Invoices' : 'Matter Invoices'}</h3>
-                  {!isClient && <button className="btn btn-primary btn-xs" onClick={() => openModal('create-invoice', matterModalContext)}>Generate Invoice</button>}
-                  {isClient && <button className="btn btn-primary btn-xs" onClick={payAllOutstanding}>Pay All Outstanding</button>}
+
+              <Card className="bg-white/[0.02] border-white/5 rounded-[2.5rem] p-10 relative z-10">
+                <div className="flex items-center justify-between mb-10 gap-6 flex-wrap">
+                  <div className="flex items-center gap-4">
+                    <div className="w-1.5 h-8 bg-[#0057c7] rounded-full" />
+                    <h3 className="text-lg font-900 text-white tracking-tight uppercase">
+                      {isClient ? 'Financial Ledger' : 'Matter Invoice Stream'}
+                    </h3>
+                  </div>
+                  <div className="flex gap-4">
+                    {!isClient && (
+                      <button className="h-11 px-6 rounded-2xl bg-[#0057c7] text-white text-[11px] font-900 uppercase tracking-widest hover:bg-[#004bb1] transition-all shadow-xl shadow-[#0057c7]/20" onClick={() => openModal('create-invoice', matterModalContext)}>
+                        New Invoice
+                      </button>
+                    )}
+                    {isClient && billingTotals.outstanding > 0 && (
+                      <button className="h-11 px-8 rounded-2xl bg-emerald-600 text-white text-[11px] font-900 uppercase tracking-[0.2em] hover:bg-emerald-500 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-emerald-600/20" onClick={payAllOutstanding}>
+                        Pay All Outstanding
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <Table headers={['Invoice ID', 'Issue Date', 'Due Date', 'Total', 'Paid', 'Outstanding', 'Status', '']}>
-                  {matterInvoices.map(inv => (
-                    <Tr key={inv.id}>
-                      <Td><span className="font-mono text-[12px] font-700 text-primary-600">{inv.id}</span></Td>
-                      <Td className="text-slate-500 text-[12px]">{inv.issued}</Td>
-                      <Td className="text-slate-500 text-[12px]">{inv.due}</Td>
-                      <Td className="font-700 text-slate-900">{inv.amount}</Td>
-                      <Td className="text-emerald-600 font-600 text-[12px]">{inv.paid}</Td>
-                      <Td className="text-red-500 font-600 text-[12px]">{inv.outstanding}</Td>
-                      <Td><Badge status={inv.status} /></Td>
-                      <Td>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <button
-                            type="button"
-                            onClick={() => openModal('view-invoice', {
-                              id: inv.id,
-                              dbId: inv.dbId,
-                              client: currentCase?.client || '—',
-                              amount: inv.amount,
-                              issued: inv.issued,
-                              due: inv.due,
-                              status: inv.status,
-                              desc: inv.desc || currentCase?.title || 'Professional Legal Services',
-                            })}
-                            className="text-primary-600 font-700 text-[12px] hover:underline"
-                          >
-                            View Invoice
-                          </button>
-                          {isClient && inv.status !== 'paid' && inv.status !== 'void' && inv.dbId != null && (
+
+                <div className="overflow-x-auto">
+                  <Table headers={['Invoice', 'Issued', 'Due Date', 'Total', 'Paid', 'Balance', 'Status', '']}>
+                    {matterInvoices.map(inv => (
+                      <Tr key={inv.id} className="group hover:bg-white/[0.02] transition-colors">
+                        <Td>
+                          <div className="flex flex-col">
+                            <span className="font-mono text-[14px] font-900 text-[#38bdf8] tracking-tighter">{inv.id}</span>
+                            <span className="text-[9px] text-[#8a94a6] font-800 uppercase tracking-widest opacity-50">Transaction ID</span>
+                          </div>
+                        </Td>
+                        <Td className="text-[#8a94a6] text-[13px] font-700 uppercase tracking-tight">{inv.issued}</Td>
+                        <Td className="text-[#8a94a6] text-[13px] font-700 uppercase tracking-tight">{inv.due}</Td>
+                        <Td className="font-900 text-white text-[16px] tabular-nums tracking-tighter">{inv.amount}</Td>
+                        <Td className="text-emerald-500/70 font-800 text-[14px] tabular-nums">{inv.paid}</Td>
+                        <Td className="text-red-400 font-900 text-[14px] tabular-nums bg-white/[0.01] rounded-lg">{inv.outstanding}</Td>
+                        <Td><Badge status={inv.status} /></Td>
+                        <Td>
+                          <div className="flex items-center gap-4">
                             <button
                               type="button"
-                              onClick={() => payInvoiceRow(inv)}
-                              disabled={payingInvoiceDbId === inv.dbId}
-                              className="btn btn-primary btn-xs"
+                              onClick={() => openModal('view-invoice', { ...inv, client: currentCase?.client || '—' })}
+                              className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-[#38bdf8] hover:bg-[#0057c7] hover:text-white transition-all border border-white/5"
+                              title="Review Invoice"
                             >
-                              {payingInvoiceDbId === inv.dbId ? 'Processing...' : 'Pay'}
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                             </button>
-                          )}
-                        </div>
-                      </Td>
-                    </Tr>
-                  ))}
-                </Table>
+                            {isClient && inv.status !== 'paid' && inv.status !== 'void' && inv.dbId != null && (
+                              <button
+                                type="button"
+                                onClick={() => payInvoiceRow(inv)}
+                                disabled={payingInvoiceDbId === inv.dbId}
+                                className="h-8 px-4 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-900 uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all"
+                              >
+                                {payingInvoiceDbId === inv.dbId ? '...' : 'Pay'}
+                              </button>
+                            )}
+                          </div>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Table>
+                </div>
               </Card>
             </div>
           )}
 
           {tab === 'Activity' && (
             <Card>
-              <h3 className="text-[15px] font-700 text-slate-900 mb-6">Discovery Activity Timeline</h3>
+              <h3 className="text-[16px] font-900 text-white mb-10 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8]" />
+                Case Activity Intelligence
+              </h3>
               <div className="space-y-0">
                 {(activityRows || []).map((act, i) => (
-                  <div key={i} className="flex gap-4 group">
+                  <div key={i} className="flex gap-8 group">
                     <div className="flex flex-col items-center">
-                      <div className={`w-3 h-3 rounded-full border-2 border-white shadow-sm z-10 ${i === 0 ? 'bg-primary-600' : 'bg-slate-300'} mt-1.5`} />
-                      {i < 5 && <div className="w-0.5 h-full bg-slate-100 -mt-0.5 group-hover:bg-primary-100 transition-colors" />}
+                      <div className={`w-4 h-4 rounded-full border-4 border-slate-900 shadow-2xl z-10 ${i === 0 ? 'bg-[#38bdf8] shadow-[0_0_12px_rgba(56,189,248,0.6)]' : 'bg-white/20'} mt-2.5`} />
+                      {i < activityRows.length - 1 && <div className="w-[1.5px] h-full bg-white/5 -mt-1 group-hover:bg-[#38bdf8]/40 transition-colors" />}
                     </div>
-                    <div className="pb-8 flex-1">
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="text-[13.5px] font-700 text-slate-800">{act.title}</h4>
-                        <span className="text-[10px] text-slate-400 font-600 uppercase tracking-widest">{act.date}</span>
+                    <div className="pb-12 flex-1">
+                      <div className="flex justify-between items-start mb-2.5">
+                        <h4 className="text-[16px] font-900 text-white tracking-tight group-hover:text-[#38bdf8] transition-colors">{act.title}</h4>
+                        <span className="text-[10px] text-[#8a94a6] font-900 uppercase tracking-[0.2em] opacity-50">{act.date}</span>
                       </div>
-                      <p className="text-[12.5px] text-slate-500">{act.text}</p>
+                      <p className="text-[14px] text-[#b8c2d1] leading-relaxed font-500 opacity-90">{act.text}</p>
                     </div>
                   </div>
                 ))}
@@ -2150,37 +2416,45 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
           )}
 
           {tab === 'Notes' && (
-            <div className="animate-fade-in space-y-4">
+            <div className="animate-fade-in space-y-6">
               <Card>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-[15px] font-700 text-slate-900">Matter Journal</h3>
-                  {!isClient && <button className="btn btn-primary btn-xs" onClick={() => openModal('add-note', matterModalContext)}>+ Add Daily Note</button>}
+                <div className="flex items-center justify-between mb-10">
+                  <h3 className="text-[16px] font-900 text-white flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />
+                    Matter Intelligence Briefs
+                  </h3>
+                  {!isClient && <button className="btn btn-primary h-8 px-5 text-[11px] font-900 uppercase tracking-widest shadow-[#f59e0b]/10" onClick={() => openModal('add-note', matterModalContext)}>+ Add Brief</button>}
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {(apiMatter?.communications || [])
                     .filter((c) => c.communication_type === 'note')
                     .map((c) => ({
-                      author: c.sender?.full_name || '—',
+                      author: c.sender?.full_name || 'Legal Intelligence',
                       date: new Date(c.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
                       text: c.message_body || '',
-                      visibility: c.visibility === 'client_visible' || c.visibility === 'client_shared' ? 'Shared' : 'Internal',
+                      visibility: c.visibility === 'client_visible' || c.visibility === 'client_shared' ? 'Shared' : 'Classified',
                     }))
                     .map((note, idx) => (
-                      (isClient && note.visibility === 'Internal') ? null : (
-                        <div key={idx} className="p-4 rounded-2xl border border-slate-50 bg-slate-50/20 group hover:shadow-sm transition-all">
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="flex items-center gap-2">
-                              <span className="text-[13px] font-700 text-slate-900">{note.author}</span>
-                              <span className="text-slate-300">·</span>
-                              <span className="text-[11px] text-slate-400 font-500">{note.date}</span>
+                      (isClient && note.visibility === 'Classified') ? null : (
+                        <div key={idx} className="p-6 rounded-2xl border border-white/5 bg-white/[0.03] group hover:bg-white/[0.05] transition-all shadow-2xl relative overflow-hidden">
+                          <div className="absolute top-0 left-0 w-1 h-full bg-white/5 group-hover:bg-[#f59e0b]/40 transition-colors" />
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex items-center gap-4">
+                              <Avatar initials={note.author.split(' ').map(n => n[0]).join('')} size="xs" />
+                              <div>
+                                <span className="text-[14px] font-900 text-white tracking-tight">{note.author}</span>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="text-[10px] text-[#8a94a6] font-900 uppercase tracking-[0.15em] opacity-60">{note.date}</span>
+                                </div>
+                              </div>
                             </div>
                             {!isClient && (
-                              <span className={`text-[9px] font-800 px-2 py-0.5 rounded-full uppercase tracking-tighter ${note.visibility === 'Internal' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                              <span className={`text-[9px] font-900 px-3 py-1 rounded-lg uppercase tracking-widest border shadow-lg ${note.visibility === 'Classified' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
                                 {note.visibility}
                               </span>
                             )}
                           </div>
-                          <p className="text-[13.5px] text-slate-600 leading-relaxed font-400">{note.text}</p>
+                          <p className="text-[14px] text-[#b8c2d1] leading-relaxed font-500 opacity-90 pl-11">{note.text}</p>
                         </div>
                       )
                     ))}
@@ -2192,59 +2466,72 @@ export function CaseDetailPage({ caseId, navigate, toast, openModal, role: origi
 
         {/* Status / Quick Panel (25%) */}
         <div className="space-y-4 lg:sticky lg:top-0">
-          <Card className="!p-0 overflow-hidden">
-            <div className="bg-slate-900 text-white p-5">
-              <p className="text-[10px] font-800 uppercase tracking-[0.2em] text-primary-400 mb-4 text-center">Matter Status Profile</p>
-              <div className="flex flex-col items-center gap-3">
-                <div className="min-w-[4rem] h-16 px-4 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white text-xl font-900 whitespace-nowrap shadow-inner shadow-white/10">
+          <Card className="!p-0 overflow-hidden border-white/5 bg-white/[0.02]">
+            <div className="bg-gradient-to-br from-slate-900 to-[#0057c7]/20 p-6 border-b border-white/5">
+              <p className="text-[10px] font-900 uppercase tracking-[0.25em] text-[#38bdf8] mb-6 text-center opacity-80">Matter Profile Identity</p>
+              <div className="flex flex-col items-center gap-4">
+                <div className="min-w-[5rem] h-14 px-5 rounded-2xl bg-gradient-to-br from-[#0057c7] to-[#38bdf8] flex items-center justify-center text-white text-xl font-900 tracking-tighter shadow-[0_8px_20px_rgba(0,87,199,0.3)] border border-white/20">
                   {currentCase.matter_number || currentCase.id || '—'}
                 </div>
                 <div className="text-center">
-                  <h3 className="text-lg font-700">{currentCase.title}</h3>
-                  <p className="text-slate-400 text-[12px]">{currentCase.type}</p>
+                  <h3 className="text-xl font-800 text-white tracking-tight">{currentCase.title}</h3>
+                  <p className="text-[#8a94a6] text-[12px] font-600 mt-1 uppercase tracking-widest">{currentCase.type}</p>
                 </div>
               </div>
             </div>
-            <div className="p-5 space-y-5">
-              <div>
-                <h4 className="text-[11px] font-800 text-slate-400 uppercase tracking-widest mb-3">Matter Information</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">💼</div>
-                    <div><p className="text-[11px] text-slate-400 font-600 uppercase">Assigned Lawyer</p><p className="text-[13px] font-700 text-slate-800 leading-tight">{currentCase.lawyer}</p></div>
+            <div className="p-6 space-y-6">
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-900 text-[#8a94a6] uppercase tracking-[0.2em] mb-4">Personnel & Clients</h4>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 group">
+                    <div className="w-10 h-10 rounded-xl bg-white/[0.04] text-[#38bdf8] flex items-center justify-center text-lg border border-white/5 transition-colors group-hover:bg-[#0057c7]/10 group-hover:border-[#0057c7]/20">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-[#8a94a6] font-800 uppercase tracking-widest mb-0.5">Assigned Counsel</p>
+                      <p className="text-[14px] font-700 text-white tracking-tight">{currentCase.lawyer}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">👤</div>
-                    <div><p className="text-[11px] text-slate-400 font-600 uppercase">Primary Client</p><p className="text-[13px] font-700 text-slate-800 leading-tight">{currentCase.client}</p></div>
+                  <div className="flex items-center gap-3 group">
+                    <div className="w-10 h-10 rounded-xl bg-white/[0.04] text-emerald-400 flex items-center justify-center text-lg border border-white/5 transition-colors group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-[#8a94a6] font-800 uppercase tracking-widest mb-0.5">Principal Client</p>
+                      <p className="text-[14px] font-700 text-white tracking-tight">{currentCase.client}</p>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="pt-5 border-t border-slate-100">
-                <h4 className="text-[11px] font-800 text-slate-400 uppercase tracking-widest mb-3">Control Center</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center text-[12px]">
-                    <span className="text-slate-500">Matter Status</span>
+              <div className="pt-6 border-t border-white/5">
+                <h4 className="text-[10px] font-900 text-[#8a94a6] uppercase tracking-[0.2em] mb-4">Command Center</h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-[13px] bg-white/[0.02] p-2 rounded-xl">
+                    <span className="text-[#8a94a6] font-600">Current Status</span>
                     <Badge status={currentCase.status} />
                   </div>
-                  <div className="flex justify-between items-center text-[12px]">
-                    <span className="text-slate-500">Matter Priority</span>
+                  <div className="flex justify-between items-center text-[13px] bg-white/[0.02] p-2 rounded-xl">
+                    <span className="text-[#8a94a6] font-600">Action Priority</span>
                     <Badge status={currentCase.priority} />
                   </div>
-                  <div className="flex justify-between items-center text-[12px]">
-                    <span className="text-slate-500">Client Portal</span>
-                    <span className="flex items-center gap-1.5 text-emerald-600 font-700"><span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" /> Active</span>
+                  <div className="flex justify-between items-center text-[13px] p-2">
+                    <span className="text-[#8a94a6] font-600">Portal Sync</span>
+                    <span className="flex items-center gap-2 text-emerald-400 font-800 text-[11px] uppercase tracking-widest">
+                      <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                      Live
+                    </span>
                   </div>
-                  <div className="flex justify-between items-center text-[12px] pt-1">
-                    <span className="text-slate-500">Last Updated</span>
-                    <span className="font-600 text-slate-700 text-[11px]">{currentCase.lastUpdated || '—'}</span>
+                  <div className="flex justify-between items-center text-[11px] p-2 pt-1 border-t border-white/[0.03] mt-2">
+                    <span className="text-[#8a94a6] font-600">Registry Snapshot</span>
+                    <span className="font-800 text-white uppercase tracking-tighter">{currentCase.lastUpdated || '—'}</span>
                   </div>
                 </div>
               </div>
               {!isClient && (
                 <div className="pt-4">
-                  <button onClick={() => toast('Matter archiving confirmed', 'warning')} className="w-full py-2.5 rounded-xl border border-slate-100 text-slate-400 text-[12px] font-700 hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all flex items-center justify-center gap-2">
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    Archive Matter
+                  <button onClick={() => toast('Matter archiving confirmed', 'warning')} className="w-full py-3 rounded-xl border border-red-500/20 bg-red-500/5 text-red-400 text-[11px] font-900 uppercase tracking-[0.2em] hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-3 group/arch">
+                    <svg className="w-4 h-4 transition-transform group-hover/arch:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    Archive Case File
                   </button>
                 </div>
               )}
@@ -2553,10 +2840,10 @@ export function CalendarPage({ toast, openModal, role = 'lawyer' }) {
 
   const getTypeStyle = (type) => {
     switch (type) {
-      case 'invoice': return 'bg-amber-100 text-amber-700';
-      case 'matter': return 'bg-blue-100 text-blue-700';
-      case 'hearing': return 'bg-red-100 text-red-700';
-      default: return 'bg-emerald-100 text-emerald-700';
+      case 'invoice': return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+      case 'matter': return 'bg-[#0057c7]/20 text-[#38bdf8] border-[#0057c7]/30';
+      case 'hearing': return 'bg-red-500/10 text-red-400 border-red-500/20';
+      default: return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
     }
   };
 
@@ -2577,8 +2864,8 @@ export function CalendarPage({ toast, openModal, role = 'lawyer' }) {
   if (loading) {
     return (
       <div className="animate-fade-in flex flex-col items-center justify-center min-h-[40vh] gap-3">
-        <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-[13px] text-slate-500">Loading calendar…</p>
+        <div className="w-10 h-10 border-4 border-[#0057c7] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[13px] text-[#8a94a6] font-bold uppercase tracking-widest">Initializing Calendar...</p>
       </div>
     );
   }
@@ -2586,46 +2873,60 @@ export function CalendarPage({ toast, openModal, role = 'lawyer' }) {
   if (error) {
     return (
       <div className="animate-fade-in space-y-4">
-        <Card className="border-red-200 bg-red-50/50">
-          <p className="text-[13px] text-red-800 font-600">{error}</p>
-          <button type="button" onClick={loadData} className="btn btn-secondary btn-sm mt-3">Retry</button>
+        <Card className="border-red-500/20 bg-red-500/5 text-center p-12">
+          <div className="text-4xl mb-4">⚠️</div>
+          <p className="text-xl font-800 text-white mb-2">Sync Interrupted</p>
+          <p className="text-[14px] text-[#8a94a6] mb-6 max-w-md mx-auto">{error}</p>
+          <button type="button" onClick={loadData} className="btn btn-primary px-8">Reconnect Calendar</button>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in space-y-4">
+    <div className="animate-fade-in space-y-6 pb-12">
       <PageHeader title="Calendar" subtitle={`${monthName} ${year} · Manage hearings, deadlines & meetings`}>
-        <button onClick={handlePrev} className="btn btn-secondary btn-xs">← Prev</button>
-        <span className="text-[13px] font-600 text-slate-700 px-3">{monthName} {year}</span>
-        <button onClick={handleNext} className="btn btn-secondary btn-xs">Next →</button>
-        <button onClick={() => openModal('add-event')} className="btn btn-primary">+ Add Event</button>
+        <div className="flex items-center gap-1 bg-white/[0.03] border border-white/5 p-1 rounded-xl">
+          <button onClick={handlePrev} className="p-2 hover:bg-white/5 rounded-lg text-white transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          <span className="text-[13px] font-800 text-white px-4 min-w-[120px] text-center uppercase tracking-widest">{monthName} {year}</span>
+          <button onClick={handleNext} className="p-2 hover:bg-white/5 rounded-lg text-white transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M9 5l7 7-7 7" /></svg>
+          </button>
+        </div>
+        <button onClick={() => openModal('add-event')} className="btn btn-primary shadow-[#0057c7]/20">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+          Add Event
+        </button>
       </PageHeader>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2">
-          <Card noPad className="overflow-hidden">
-            <div className="grid grid-cols-7 border-b border-slate-100">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3">
+          <Card className="!p-0 overflow-hidden border-white/5 bg-white/[0.02]">
+            <div className="grid grid-cols-7 border-b border-white/5 bg-white/[0.03]">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-                <div key={d} className="py-2 text-center text-[11px] font-600 text-slate-500 uppercase tracking-wide">{d}</div>
+                <div key={d} className="py-4 text-center text-[10px] font-900 text-[#8a94a6] uppercase tracking-[0.2em]">{d}</div>
               ))}
             </div>
-            <div className="grid grid-cols-7 divide-x divide-y divide-slate-100">
+            <div className="grid grid-cols-7 divide-x divide-y divide-white/5 border-b border-white/5">
               {days.map(({ day, other }, i) => {
                 const cellDate = new Date(year, monthIdx, day);
                 const evts = other ? [] : events.filter(e => sameDay(e.date, cellDate));
                 const isToday = !other && day === today.getDate() && monthIdx === today.getMonth() && year === today.getFullYear();
 
                 return (
-                  <div key={i} onClick={() => openModal('add-event', { date: cellDate })} className={`min-h-[84px] p-1.5 ${other ? 'bg-slate-50' : 'hover:bg-slate-50'} cursor-pointer transition-all hover:shadow-inner group relative`}>
-                    <div className={`w-5 h-5 flex items-center justify-center text-[12px] mb-1.5 rounded-full ${isToday ? 'bg-primary-600 text-white font-700 shadow-sm' : other ? 'text-slate-300' : 'text-slate-700'}`}>{day}</div>
-                    <div className="space-y-0.5">
+                  <div key={i} onClick={() => openModal('add-event', { date: cellDate })} className={`min-h-[120px] p-2 ${other ? 'bg-black/20' : 'hover:bg-white/[0.04]'} cursor-pointer transition-all group relative overflow-hidden`}>
+                    <div className="absolute top-0 right-0 p-8 opacity-[0.02] pointer-events-none group-hover:opacity-[0.05] transition-opacity">
+                      <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z" /></svg>
+                    </div>
+                    <div className={`w-7 h-7 flex items-center justify-center text-[12px] mb-2 rounded-xl transition-all ${isToday ? 'bg-gradient-to-br from-[#0057c7] to-[#38bdf8] text-white font-900 shadow-[0_4px_12px_rgba(56,189,248,0.4)]' : other ? 'text-white/10' : 'text-white/40 font-800'}`}>{day}</div>
+                    <div className="space-y-1 relative z-10">
                       {evts.map((e, j) => (
                         <div
                           key={j}
                           onClick={(ev) => { ev.stopPropagation(); openModal('view-event', e); }}
-                          className={`text-[9px] font-700 px-1.5 py-0.5 rounded truncate border border-black/5 shadow-sm transition-transform hover:scale-[1.02] active:scale-95 ${getTypeStyle(e.type)}`}
+                          className={`text-[10px] font-800 px-2 py-1 rounded-lg truncate border shadow-sm transition-all hover:scale-[1.02] active:scale-95 ${getTypeStyle(e.type)}`}
                         >
                           {e.title}
                         </div>
@@ -2638,63 +2939,78 @@ export function CalendarPage({ toast, openModal, role = 'lawyer' }) {
           </Card>
         </div>
 
-        <div className="space-y-3">
-          <Card>
-            <h3 className="text-[13px] font-800 text-slate-900 uppercase tracking-widest mb-4">Agenda: {monthName}</h3>
+        <div className="space-y-6">
+          <Card className="bg-white/[0.02] border-white/5">
+            <h3 className="text-[11px] font-900 text-white uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8]" />
+              Agenda: {monthName}
+            </h3>
             <div className="space-y-3">
               {monthEventsSide.length > 0 ? monthEventsSide.map((e, i) => (
                 <div
                   key={i}
                   onClick={() => openModal('view-event', e)}
-                  className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white hover:shadow-md hover:border-slate-200 transition-all border border-transparent group cursor-pointer"
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] hover:border-[#38bdf8]/30 transition-all group cursor-pointer shadow-xl relative overflow-hidden"
                 >
-                  <div className="w-10 h-10 bg-primary-50 rounded-xl flex flex-col items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform shadow-sm">
-                    <span className="text-[14px] font-800 text-primary-700 leading-none">{new Date(e.date).getDate()}</span>
-                    <span className="text-[8px] text-primary-400 font-800 uppercase mt-0.5">{monthName.slice(0, 3)}</span>
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-[#0057c7]/5 blur-2xl pointer-events-none group-hover:bg-[#0057c7]/10" />
+                  <div className="w-11 h-11 bg-white/[0.05] rounded-xl flex flex-col items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform shadow-inner border border-white/10">
+                    <span className="text-[16px] font-900 text-white tracking-tighter leading-none">{new Date(e.date).getDate()}</span>
+                    <span className="text-[8px] text-[#38bdf8] font-900 uppercase mt-1 tracking-widest">{monthName.slice(0, 3)}</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[12.5px] font-700 text-slate-800 truncate">{e.title}</p>
-                    <p className="text-[11px] text-slate-400 font-500 uppercase tracking-wide">{e.type}</p>
+                  <div className="flex-1 min-w-0 relative z-10">
+                    <p className="text-[14px] font-800 text-white truncate tracking-tight">{e.title}</p>
+                    <p className="text-[10px] text-[#8a94a6] font-900 uppercase tracking-widest mt-0.5 opacity-60">{e.type}</p>
                   </div>
-                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${e.type === 'invoice' ? 'bg-amber-400' : e.type === 'matter' ? 'bg-blue-400' : 'bg-emerald-400'}`} />
+                  <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 shadow-[0_0_8px_currentColor] ${e.type === 'invoice' ? 'text-amber-400 bg-amber-400' : e.type === 'matter' ? 'text-[#38bdf8] bg-[#38bdf8]' : 'text-emerald-400 bg-emerald-400'}`} />
                 </div>
               )) : (
-                <div className="py-12 text-center">
-                  <p className="text-[12px] text-slate-400 italic">No events scheduled for this month.</p>
+                <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl bg-white/[0.01]">
+                  <p className="text-[12px] text-[#8a94a6] font-800 uppercase tracking-widest opacity-40">No entries detected</p>
+                  <p className="text-[10px] text-[#8a94a6] mt-2 italic">Calendar sync optimized.</p>
                 </div>
               )}
             </div>
           </Card>
 
-          <Card className="bg-slate-900 text-white border-0 shadow-xl shadow-slate-900/10">
-            <h3 className="text-[12px] font-800 uppercase tracking-widest mb-4 text-slate-400">Quick Add Event</h3>
-            <div className="space-y-3">
-              <input
-                className="w-full text-[13px] bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-primary-500 transition-all"
-                placeholder="What's happening?"
-                value={quickTitle}
-                onChange={e => setQuickTitle(e.target.value)}
-              />
-              <input
-                type="date"
-                className="w-full text-[13px] bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-primary-500 transition-all [color-scheme:dark]"
-                value={quickDate}
-                onChange={e => setQuickDate(e.target.value)}
-              />
-              <select
-                className="w-full text-[13px] bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-primary-500 transition-all appearance-none cursor-pointer"
-                value={quickMatter}
-                onChange={e => setQuickMatter(e.target.value)}
-              >
-                <option value="" className="bg-slate-900">General Event</option>
-                {matterPick.map((c) => <option key={c.id} value={c.id} className="bg-slate-900">{c.label}</option>)}
-              </select>
+          <Card className="bg-gradient-to-br from-slate-900 to-[#0057c7]/20 border-white/10 shadow-2xl relative overflow-hidden group">
+            <div className="absolute -top-12 -right-12 w-32 h-32 bg-primary-500/10 rounded-full blur-3xl group-hover:bg-primary-500/20 transition-all duration-700" />
+            <h3 className="text-[11px] font-900 uppercase tracking-[0.3em] mb-6 text-[#38bdf8]">Quick Entry Terminal</h3>
+            <div className="space-y-4">
+              <div className="relative group/input">
+                <input
+                  className="w-full text-[13px] bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/20 outline-none focus:border-[#38bdf8] focus:ring-4 focus:ring-[#0057c7]/20 transition-all font-600"
+                  placeholder="Event title or subject..."
+                  value={quickTitle}
+                  onChange={e => setQuickTitle(e.target.value)}
+                />
+              </div>
+              <div className="relative group/input">
+                <input
+                  type="date"
+                  className="w-full text-[13px] bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-[#38bdf8] focus:ring-4 focus:ring-[#0057c7]/20 transition-all [color-scheme:dark] font-600"
+                  value={quickDate}
+                  onChange={e => setQuickDate(e.target.value)}
+                />
+              </div>
+              <div className="relative group/input">
+                <select
+                  className="w-full text-[13px] bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-[#38bdf8] focus:ring-4 focus:ring-[#0057c7]/20 transition-all appearance-none cursor-pointer font-600"
+                  value={quickMatter}
+                  onChange={e => setQuickMatter(e.target.value)}
+                >
+                  <option value="" className="bg-slate-900">General Schedule</option>
+                  {matterPick.map((c) => <option key={c.id} value={c.id} className="bg-slate-900">{c.label}</option>)}
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#8a94a6]">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
               <button
                 onClick={handleQuickAdd}
                 disabled={isAdding}
-                className="btn btn-primary w-full justify-center h-11 text-[13px] font-800 shadow-lg shadow-primary-500/20 disabled:opacity-50"
+                className="btn btn-primary w-full justify-center h-12 text-[12px] font-900 uppercase tracking-widest shadow-xl shadow-[#0057c7]/20 disabled:opacity-50 active:scale-[0.98]"
               >
-                {isAdding ? 'Adding...' : 'Add to Schedule'}
+                {isAdding ? 'Dispatching...' : 'Schedule Event →'}
               </button>
             </div>
           </Card>
@@ -2776,8 +3092,8 @@ export function DocumentsPage({ toast, openModal, role = 'lawyer' }) {
   if (isAdmin && docLoading) {
     return (
       <div className="animate-fade-in flex flex-col items-center justify-center min-h-[40vh] gap-3">
-        <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-[13px] text-slate-500">Loading documents…</p>
+        <div className="w-10 h-10 border-4 border-[#0057c7] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[13px] text-[#8a94a6] font-bold uppercase tracking-widest">Initializing Vault...</p>
       </div>
     );
   }
@@ -2785,85 +3101,118 @@ export function DocumentsPage({ toast, openModal, role = 'lawyer' }) {
   if (isAdmin && docError) {
     return (
       <div className="animate-fade-in space-y-4">
-        <Card className="border-red-200 bg-red-50/50">
-          <p className="text-[13px] text-red-800 font-600">{docError}</p>
+        <Card className="border-red-500/20 bg-red-500/5 text-center p-12">
+          <div className="text-4xl mb-4">⚠️</div>
+          <p className="text-xl font-800 text-white mb-2">Vault Connection Interrupted</p>
+          <p className="text-[14px] text-[#8a94a6] mb-6 max-w-md mx-auto">{docError}</p>
+          <button type="button" onClick={fetchData} className="btn btn-primary px-8">Reconnect Vault</button>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in space-y-4">
-      <PageHeader title="Documents" subtitle="Manage all matter documents and files">
-        <button onClick={() => openModal('add-document')} className="btn btn-secondary">Upload File</button>
-        <button onClick={() => openModal('add-folder')} className="btn btn-primary">+ New Folder</button>
+    <div className="animate-fade-in space-y-6 pb-12">
+      <PageHeader title="Documents" subtitle="Secure repository for all matter evidence & case files">
+        <button onClick={() => openModal('add-document')} className="btn btn-secondary border-white/10 hover:bg-white/5">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+          Upload File
+        </button>
+        <button onClick={() => openModal('add-folder')} className="btn btn-primary shadow-[#0057c7]/20">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+          New Folder
+        </button>
       </PageHeader>
 
-      <Card>
-        <h3 className="text-[13px] font-600 text-slate-900 mb-3">Matter Folders</h3>
-        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2.5">
+      <Card className="bg-white/[0.02] border-white/5">
+        <h3 className="text-[11px] font-900 text-white uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />
+          Matter Repository Folders
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
           {folders.map(f => (
             <div
               key={f.name}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setSelectedFolder((prev) => (prev === f.name ? null : f.name));
-                }
-              }}
-              onClick={() => {
-                setSelectedFolder((prev) => (prev === f.name ? null : f.name));
-                toast(`Opened folder ${f.name}`, 'info');
-              }}
-              className={`flex flex-col items-center p-3 rounded-xl border cursor-pointer transition-all group ${selectedFolder === f.name
-                  ? 'border-primary-500 ring-2 ring-primary-200 bg-primary-50/40'
-                  : 'border-slate-200 hover:border-primary-300 hover:bg-primary-50/30'
+              onClick={() => setSelectedFolder((prev) => (prev === f.name ? null : f.name))}
+              className={`flex flex-col items-center p-5 rounded-2xl border cursor-pointer transition-all group relative overflow-hidden ${selectedFolder === f.name
+                  ? 'border-[#f59e0b] bg-[#f59e0b]/5 ring-1 ring-[#f59e0b]/50 shadow-[0_0_20px_rgba(245,158,11,0.1)]'
+                  : 'border-white/5 bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/10'
                 }`}
             >
-              <span className="text-3xl mb-1.5">📁</span>
-              <p className={`text-[11px] font-600 text-center leading-tight ${selectedFolder === f.name ? 'text-primary-800' : 'text-slate-800 group-hover:text-primary-700'}`}>{f.name}</p>
-              <p className="text-[10px] text-slate-400">{f.count} files</p>
+              <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none group-hover:opacity-[0.06] transition-opacity">
+                <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" /></svg>
+              </div>
+              <div className={`mb-3 transition-transform group-hover:scale-110 ${selectedFolder === f.name ? 'text-[#f59e0b]' : 'text-[#8a94a6]'}`}>
+                <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                </svg>
+              </div>
+              <p className={`text-[13px] font-800 text-center leading-tight mb-1 tracking-tight ${selectedFolder === f.name ? 'text-white' : 'text-[#b8c2d1]'}`}>{f.name}</p>
+              <p className="text-[10px] text-[#8a94a6] font-900 uppercase tracking-widest opacity-60">{f.count} objects</p>
             </div>
           ))}
         </div>
       </Card>
 
-      <Card>
-        <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
+      <Card className="bg-white/[0.02] border-white/5">
+        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <div>
-            <h3 className="text-[13px] font-600 text-slate-900">Recent Files</h3>
+            <h3 className="text-[11px] font-900 text-white uppercase tracking-[0.3em] flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8]" />
+              Recent Objects & Files
+            </h3>
             {selectedFolder && (
-              <p className="text-[11px] text-slate-500 mt-0.5">Showing: {selectedFolder} · click folder again to show all</p>
+              <p className="text-[10px] text-[#38bdf8] font-900 uppercase tracking-widest mt-2">Active Filter: {selectedFolder}</p>
             )}
           </div>
-          <SearchInput placeholder="Search files..." value={search} onChange={setSearch} />
+          <div className="w-full sm:w-72">
+            <SearchInput placeholder="Search within vault..." value={search} onChange={setSearch} />
+          </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {filtered.map(d => (
-            <div key={d.id} className="flex flex-col gap-2 p-3 rounded-xl border border-slate-200 hover:border-primary-300 hover:shadow-md cursor-pointer transition-all group">
-              <FileIcon type={d.type} />
-              <div>
-                <p className="text-[12px] font-500 text-slate-800 group-hover:text-primary-600 line-clamp-2 leading-tight">{d.name}</p>
-                <p className="text-[10px] text-slate-400 mt-0.5">{d.size} · {d.uploaded}</p>
-                <p className="text-[10px] text-slate-400">{d.caseId}</p>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {filtered.length > 0 ? filtered.map(d => (
+            <div key={d.id} className="flex flex-col gap-4 p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] hover:border-[#38bdf8]/30 transition-all group cursor-pointer shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#0057c7]/5 blur-3xl pointer-events-none group-hover:bg-[#0057c7]/10" />
+              <div className="flex items-start justify-between relative z-10">
+                <FileIcon type={d.type} />
+                <div className="text-right">
+                  <p className="text-[10px] text-[#8a94a6] font-900 uppercase tracking-widest opacity-60 leading-none mb-1">Uploaded</p>
+                  <p className="text-[11px] text-white font-800 tracking-tight">{d.uploaded}</p>
+                </div>
+              </div>
+              <div className="relative z-10 flex-1">
+                <p className="text-[14px] font-800 text-white group-hover:text-[#38bdf8] transition-colors line-clamp-2 leading-tight tracking-tight mb-2 min-h-[2.5em]">{d.name}</p>
+                <div className="flex items-center justify-between mt-auto">
+                  <span className="text-[10px] text-[#38bdf8] font-900 bg-[#0057c7]/10 border border-[#0057c7]/20 px-2 py-0.5 rounded-md uppercase tracking-widest">{d.caseId}</span>
+                  <span className="text-[10px] text-[#8a94a6] font-900 uppercase tracking-widest opacity-40">{d.size}</span>
+                </div>
               </div>
               <button
-                onClick={async () => {
+                onClick={async (e) => {
+                  e.stopPropagation();
                   try {
                     await downloadDocumentBlob(d.id, d.name);
                     toast(`${d.name} download started`, 'success');
-                  } catch (e) {
-                    toast(e.message || 'Download failed', 'error');
+                  } catch (err) {
+                    toast(err.message || 'Download failed', 'error');
                   }
                 }}
-                className="btn btn-secondary text-[11px] py-1 justify-center w-full mt-auto"
+                className="btn btn-secondary w-full justify-center text-[10px] font-900 uppercase tracking-[0.2em] h-10 border-white/10 hover:bg-[#38bdf8]/10 hover:text-[#38bdf8] hover:border-[#38bdf8]/30 transition-all mt-2 relative z-10"
               >
-                ⬇ Download
+                <svg className="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                Download
               </button>
             </div>
-          ))}
+          )) : (
+            <div className="col-span-full py-24 text-center border-2 border-dashed border-white/5 rounded-3xl bg-white/[0.01]">
+              <div className="w-20 h-20 bg-white/[0.03] rounded-full flex items-center justify-center mx-auto mb-4 border border-white/5">
+                <svg className="w-10 h-10 text-[#8a94a6]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              </div>
+              <p className="text-[14px] text-white font-800 tracking-tight mb-1">No objects found</p>
+              <p className="text-[12px] text-[#8a94a6] font-500">Try adjusting your search or filters.</p>
+            </div>
+          )}
         </div>
       </Card>
     </div>
@@ -2911,7 +3260,7 @@ export function BillingPage({ openModal, toast, navigate, role = 'lawyer' }) {
     } finally {
       setBillLoading(false);
     }
-  }, [isAdmin]);
+  }, [isAdmin, role]);
 
   useEffect(() => {
     loadBillingData();
@@ -2924,7 +3273,6 @@ export function BillingPage({ openModal, toast, navigate, role = 'lawyer' }) {
       return { unbilled: '—', draft: '$0.00', ar: '$0.00', mtd: '$0.00' };
     }
     
-    // Calculate Invoices Stats
     let draft = 0;
     let ar = 0;
     let mtd = 0;
@@ -2941,7 +3289,6 @@ export function BillingPage({ openModal, toast, navigate, role = 'lawyer' }) {
         ar += dueAmt;
       }
 
-      // Revenue MTD: sum of payments made this month
       (inv.payments || []).forEach(p => {
         const pd = p.paid_on ? new Date(p.paid_on) : null;
         if (pd && !Number.isNaN(pd.getTime()) && pd >= startMonth) {
@@ -2950,7 +3297,6 @@ export function BillingPage({ openModal, toast, navigate, role = 'lawyer' }) {
       });
     });
 
-    // Calculate Unbilled Time (Running timers + stopped but not invoiced - though backend usually invoices immediately)
     const rate = parseFloat(apiSettings.billing_rate) || 150;
     let unbilledMins = 0;
     apiTimers.forEach(t => {
@@ -2960,7 +3306,6 @@ export function BillingPage({ openModal, toast, navigate, role = 'lawyer' }) {
         const diff = Math.max(0, Math.floor((now - start) / 60000));
         unbilledMins += diff;
       } else if (!t.invoice_id) {
-        // Technically backend handles this, but for safety:
         unbilledMins += (t.duration_minutes || 0);
       }
     });
@@ -2988,7 +3333,7 @@ export function BillingPage({ openModal, toast, navigate, role = 'lawyer' }) {
           date: dateStr,
           desc: `Invoice ${inv.invoice_number}${matterNum ? ` · ${matterNum}` : ''}`,
           amount: paid ? `+${billFormatUsd(inv.amount)}` : billFormatUsd(inv.amount),
-          color: paid ? 'text-emerald-600' : 'text-slate-700',
+          color: paid ? 'text-[#10b981]' : 'text-[#b8c2d1]',
           bal: '—',
         };
       });
@@ -3018,8 +3363,8 @@ export function BillingPage({ openModal, toast, navigate, role = 'lawyer' }) {
   if (isAdmin && billLoading) {
     return (
       <div className="animate-fade-in flex flex-col items-center justify-center min-h-[40vh] gap-3">
-        <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-[13px] text-slate-500">Loading billing…</p>
+        <div className="w-10 h-10 border-4 border-[#0057c7] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[13px] text-[#8a94a6] font-bold uppercase tracking-widest">Auditing Ledgers...</p>
       </div>
     );
   }
@@ -3027,118 +3372,169 @@ export function BillingPage({ openModal, toast, navigate, role = 'lawyer' }) {
   if (isAdmin && billError) {
     return (
       <div className="animate-fade-in space-y-4">
-        <Card className="border-red-200 bg-red-50/50">
-          <p className="text-[13px] text-red-800 font-600">{billError}</p>
+        <Card className="border-red-500/20 bg-red-500/5 text-center p-12">
+          <div className="text-4xl mb-4">⚠️</div>
+          <p className="text-xl font-800 text-white mb-2">Ledger Synchronization Failed</p>
+          <p className="text-[14px] text-[#8a94a6] mb-6 max-w-md mx-auto">{billError}</p>
+          <button type="button" onClick={loadBillingData} className="btn btn-primary px-8">Sync Financials</button>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in space-y-4">
-      <PageHeader title="Billing & Financials" subtitle="Manage invoices, trust accounts, and billable time">
-        <button onClick={() => navigate('calendar')} className="btn btn-secondary">Time Entries</button>
-        <button onClick={() => openModal('create-invoice')} className="btn btn-primary">+ Create Invoice</button>
+    <div className="animate-fade-in space-y-6 pb-12">
+      <PageHeader title="Billing & Financials" subtitle="Executive oversight of firm revenue, trust accounts, and unbilled time">
+        <button onClick={() => navigate('calendar')} className="btn btn-secondary border-white/10 hover:bg-white/5 active:scale-[0.98]">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          Time Entries
+        </button>
+        <button onClick={() => openModal('create-invoice')} className="btn btn-primary shadow-[#0057c7]/20 active:scale-[0.98]">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+          Create Invoice
+        </button>
       </PageHeader>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Unbilled Time" value={adminStats.unbilled} icon="⏱️" iconBg="bg-blue-50" gradient="linear-gradient(90deg,#0B1F3A,#C9A24A)" />
-        <StatCard label="Draft Invoices" value={adminStats.draft} icon="📝" iconBg="bg-slate-50" gradient="linear-gradient(90deg,#94a3b8,#cbd5e1)" />
-        <StatCard label="Outstanding (A/R)" value={adminStats.ar} icon="⏳" iconBg="bg-amber-50" gradient="linear-gradient(90deg,#f59e0b,#fbbf24)" />
-        <StatCard label="Collected (MTD)" value={adminStats.mtd} icon="💰" iconBg="bg-emerald-50" gradient="linear-gradient(90deg,#10b981,#34d399)" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="Unbilled Time" value={adminStats.unbilled} change="+8.2%"
+          icon={<svg className="w-6 h-6 text-[#38bdf8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>} />
+        <StatCard label="Draft Invoices" value={adminStats.draft} 
+          icon={<svg className="w-6 h-6 text-[#94a3b8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>} />
+        <StatCard label="Outstanding (A/R)" value={adminStats.ar} change="-2.4%"
+          icon={<svg className="w-6 h-6 text-[#f59e0b]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /><path d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.07-7.07l-1.41 1.41M6.34 17.66l-1.41 1.41M17.66 17.66l1.41 1.41M6.34 6.34l1.41-1.41" /></svg>} />
+        <StatCard label="Collected (MTD)" value={adminStats.mtd} change="+14.5%"
+          icon={<svg className="w-6 h-6 text-[#10b981]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3 1.343 3 3-1.343 3-3 3m0-12c1.657 0 3 1.343 3 3s-1.343 3-3 3-3-1.343-3-3 1.343-3 3-3m0-4v2m0 16v2" /></svg>} />
       </div>
 
       <Tabs tabs={['Invoices', 'Trust Accounts', 'Ledger', 'Expenses']} active={tab} onChange={setTab} />
 
       {tab === 'Invoices' && (
-        <Table headers={['Invoice ID', 'Client', 'Amount', 'Issued', 'Due Date', 'Status', '']}
-          searchPlaceholder="Search invoices..." onSearch={setSearch}>
-          {filteredInvoices.map(inv => (
-            <Tr key={inv.id}>
-              <Td className="font-700 text-slate-900">{inv.id}</Td>
-              <Td>
-                <div className="flex items-center gap-2">
-                  <Avatar initials={inv.client.split(' ').map(n => n[0]).join('') || '—'} size="xs" />
-                  <span className="font-500">{inv.client}</span>
-                </div>
-              </Td>
-              <Td>
-                <div className="font-700">{billFormatUsd(inv.amount)}</div>
-                {inv.paid_amount > 0 && <div className="text-[10px] text-emerald-600 font-600">Paid: {billFormatUsd(inv.paid_amount)}</div>}
-                {inv.due_amount > 0 && <div className="text-[10px] text-red-500 font-600">Due: {billFormatUsd(inv.due_amount)}</div>}
-              </Td>
-              <Td className="text-slate-500">{inv.issued}</Td>
-              <Td className="text-slate-500">{inv.due}</Td>
-              <Td><Badge status={inv.status} /></Td>
-              <Td>
-                <div className="flex gap-1 flex-wrap">
-                  <button onClick={() => openModal('view-invoice', inv)} className="btn btn-secondary btn-xs p-1.5" title="View Details">👁️</button>
-                  {canMarkPaid && inv.status !== 'paid' && inv.status !== 'void' && inv.dbId != null && (
-                    <button onClick={() => openModal('pay-invoice', inv)} className="btn btn-primary btn-xs p-1.5" title="Mark paid">✓</button>
-                  )}
-                  <button onClick={() => downloadInvoicePdfBlob(inv.dbId, inv.id, toast)} className="btn btn-secondary btn-xs p-1.5" title="Download PDF">📥</button>
-                </div>
-              </Td>
-            </Tr>
-          ))}
-        </Table>
-      )}
-      {tab === 'Trust Accounts' && (
-        <div className="space-y-3">
-          <div className="flex justify-end">
-             <button onClick={() => openModal('trust-deposit')} className="btn btn-primary btn-sm">+ Trust Deposit</button>
-          </div>
-          <Table headers={['Client', 'Account ID', 'Balance', 'Last Activity', 'Status', '']}>
-            {apiTrustAccounts.length === 0 ? (
-              <Tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-slate-500 text-[13px]">No trust account records found.</td>
+        <Card className="!p-0 overflow-hidden border-white/5 bg-white/[0.02]">
+          <Table headers={['Invoice ID', 'Client Entity', 'Value & Status', 'Issuance', 'Due Date', 'Status', 'Actions']}
+            searchPlaceholder="Search invoice archives..." onSearch={setSearch}>
+            {filteredInvoices.map(inv => (
+              <Tr key={inv.id} className="hover:bg-white/[0.03] transition-colors group">
+                <Td>
+                  <p className="text-[14px] font-900 text-white tracking-tighter group-hover:text-[#38bdf8] transition-colors">{inv.id}</p>
+                  <p className="text-[10px] text-[#8a94a6] font-900 uppercase tracking-widest opacity-40">Financial Record</p>
+                </Td>
+                <Td>
+                  <div className="flex items-center gap-3">
+                    <Avatar initials={inv.client.split(' ').map(n => n[0]).join('') || '—'} size="xs" />
+                    <span className="text-[13px] font-800 text-white tracking-tight">{inv.client}</span>
+                  </div>
+                </Td>
+                <Td>
+                  <div className="text-[15px] font-900 text-white tracking-tighter">{billFormatUsd(inv.amount)}</div>
+                  {inv.paid_amount > 0 && <p className="text-[10px] text-[#10b981] font-900 uppercase tracking-widest mt-1">Paid: {billFormatUsd(inv.paid_amount)}</p>}
+                  {inv.due_amount > 0 && <p className="text-[10px] text-red-400 font-900 uppercase tracking-widest mt-1">Due: {billFormatUsd(inv.due_amount)}</p>}
+                </Td>
+                <Td className="text-[13px] text-[#b8c2d1] font-600">{inv.issued}</Td>
+                <Td className="text-[13px] text-[#b8c2d1] font-600">{inv.due}</Td>
+                <Td><Badge status={inv.status} /></Td>
+                <Td>
+                  <div className="flex gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => openModal('view-invoice', inv)} className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-[#38bdf8]/10 hover:text-[#38bdf8] hover:border-[#38bdf8]/30 transition-all" title="Review Intelligence">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    </button>
+                    {canMarkPaid && inv.status !== 'paid' && inv.status !== 'void' && inv.dbId != null && (
+                      <button onClick={() => openModal('pay-invoice', inv)} className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 hover:bg-emerald-500/20 transition-all" title="Authorize Payment">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M5 13l4 4L19 7" /></svg>
+                      </button>
+                    )}
+                    <button onClick={() => downloadInvoicePdfBlob(inv.dbId, inv.id, toast)} className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-[#f59e0b]/10 hover:text-[#f59e0b] hover:border-[#f59e0b]/30 transition-all" title="Export Statement">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    </button>
+                  </div>
+                </Td>
               </Tr>
-            ) : (
-              apiTrustAccounts.map(ta => (
-                <Tr key={ta.id}>
-                  <Td>
-                    <div className="flex items-center gap-2">
-                      <Avatar initials={ta.client?.full_name?.split(' ').map(n => n[0]).join('') || '—'} size="xs" />
-                      <span className="font-500">{ta.client?.full_name || '—'}</span>
-                    </div>
-                  </Td>
-                  <Td className="text-slate-500 text-[12px]">TR-{String(ta.id).padStart(4, '0')}</Td>
-                  <Td className="font-700 text-emerald-600">{billFormatUsd(ta.balance)}</Td>
-                  <Td className="text-slate-500 text-[12px]">{ta.updated_at ? new Date(ta.updated_at).toLocaleDateString() : '—'}</Td>
-                  <Td><Badge status="active" /></Td>
-                  <Td>
-                    <div className="flex gap-2">
-                      <button onClick={() => openModal('trust-ledger', ta)} className="btn btn-secondary btn-xs p-1.5" title="View History">📜</button>
-                      <button onClick={() => openModal('apply-trust', ta)} className="btn btn-primary btn-xs p-1.5" title="Apply to Invoice">💳</button>
-                    </div>
-                  </Td>
-                </Tr>
-              ))
-            )}
+            ))}
           </Table>
+        </Card>
+      )}
+
+      {tab === 'Trust Accounts' && (
+        <div className="space-y-4">
+          <div className="flex justify-end">
+             <button onClick={() => openModal('trust-deposit')} className="btn btn-primary shadow-[#0057c7]/20">
+               <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+               Trust Deposit
+             </button>
+          </div>
+          <Card className="!p-0 overflow-hidden border-white/5 bg-white/[0.02]">
+            <Table headers={['Client Entity', 'Account Identifier', 'Current Balance', 'Last Activity', 'Lifecycle', 'Operations']}>
+              {apiTrustAccounts.length === 0 ? (
+                <Tr>
+                  <td colSpan={6} className="px-4 py-24 text-center text-[#8a94a6] text-[13px] font-500 italic opacity-40">No institutional trust records located.</td>
+                </Tr>
+              ) : (
+                apiTrustAccounts.map(ta => (
+                  <Tr key={ta.id} className="hover:bg-white/[0.03] transition-colors group">
+                    <Td>
+                      <div className="flex items-center gap-3">
+                        <Avatar initials={ta.client?.full_name?.split(' ').map(n => n[0]).join('') || '—'} size="xs" />
+                        <span className="text-[13px] font-800 text-white tracking-tight">{ta.client?.full_name || '—'}</span>
+                      </div>
+                    </Td>
+                    <Td>
+                      <p className="text-[13px] text-white font-900 tracking-tighter uppercase">TR-{String(ta.id).padStart(4, '0')}</p>
+                      <p className="text-[10px] text-[#8a94a6] font-900 uppercase tracking-widest opacity-40">Escrow ID</p>
+                    </Td>
+                    <Td>
+                      <p className="text-[15px] font-900 text-[#10b981] tracking-tighter">{billFormatUsd(ta.balance)}</p>
+                      <p className="text-[10px] text-[#8a94a6] font-900 uppercase tracking-widest opacity-40">Liquid Assets</p>
+                    </Td>
+                    <Td className="text-[13px] text-[#b8c2d1] font-600">{ta.updated_at ? new Date(ta.updated_at).toLocaleDateString() : '—'}</Td>
+                    <Td><Badge status="active" /></Td>
+                    <Td>
+                      <div className="flex gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => openModal('trust-ledger', ta)} className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-[#38bdf8]/10 hover:text-[#38bdf8] hover:border-[#38bdf8]/30 transition-all" title="View Intelligence">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        </button>
+                        <button onClick={() => openModal('apply-trust', ta)} className="w-8 h-8 rounded-lg bg-[#0057c7]/10 border border-[#0057c7]/20 flex items-center justify-center text-[#38bdf8] hover:bg-[#0057c7]/20 transition-all" title="Apply Liquidated">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                        </button>
+                      </div>
+                    </Td>
+                  </Tr>
+                ))
+              )}
+            </Table>
+          </Card>
         </div>
       )}
 
       {tab === 'Expenses' && (
-        <Table headers={['Vendor / Description', 'Matter ID', 'Category', 'Amount', 'Date', 'Status']}>
-          <Tr>
-            <td colSpan={6} className="px-4 py-10 text-center text-slate-500 text-[13px]">No expense records in the database.</td>
-          </Tr>
-        </Table>
+        <Card className="!p-0 overflow-hidden border-white/5 bg-white/[0.02]">
+          <Table headers={['Vendor Brief', 'Matter Reference', 'Classification', 'Fiscal Value', 'Execution Date', 'Status']}>
+            <Tr>
+              <td colSpan={6} className="px-4 py-24 text-center text-[#8a94a6] text-[13px] font-500 italic opacity-40">No outstanding expense records synchronized.</td>
+            </Tr>
+          </Table>
+        </Card>
       )}
+
       {tab === 'Ledger' && (
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[14px] font-700 text-slate-900">Firm Transaction Ledger</h3>
-            <button onClick={() => toast('Financial statement generated successfully!', 'success')} className="btn btn-secondary btn-xs">Generate Statement</button>
+        <Card className="bg-white/[0.02] border-white/5">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h3 className="text-[11px] font-900 text-white uppercase tracking-[0.3em] flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
+                Institutional Transaction Ledger
+              </h3>
+              <p className="text-[10px] text-[#8a94a6] font-900 uppercase tracking-widest mt-2 opacity-60">Verified Immutable Record</p>
+            </div>
+            <button onClick={() => toast('Financial statement generated successfully!', 'success')} className="btn btn-secondary border-white/10 hover:bg-white/5 text-[11px] font-900 uppercase tracking-widest">
+              Export Statement
+            </button>
           </div>
           <div className="space-y-0 text-[13px]">
             {ledgerRows.map((row, i) => (
-              <div key={i} className="grid grid-cols-12 gap-4 py-3 border-b border-slate-50 hover:bg-slate-50 px-2 transition-colors">
-                <div className="col-span-2 text-slate-400">{row.date}</div>
-                <div className="col-span-6 font-500 text-slate-800">{row.desc}</div>
-                <div className={`col-span-2 font-700 text-right ${row.color}`}>{row.amount}</div>
-                <div className="col-span-2 text-right font-600 text-slate-400">{row.bal}</div>
+              <div key={i} className="grid grid-cols-12 gap-4 py-4 border-b border-white/5 hover:bg-white/[0.03] px-4 transition-all group rounded-xl">
+                <div className="col-span-2 text-[#8a94a6] font-800 uppercase tracking-tighter opacity-60">{row.date}</div>
+                <div className="col-span-6 font-800 text-white tracking-tight group-hover:text-[#38bdf8] transition-colors">{row.desc}</div>
+                <div className={`col-span-2 font-900 text-right tracking-tighter ${row.color}`}>{row.amount}</div>
+                <div className="col-span-2 text-right font-900 text-[#8a94a6] tracking-tighter opacity-40">{row.bal}</div>
               </div>
             ))}
           </div>
@@ -3158,6 +3554,7 @@ export function EmailPage({ toast, openModal, role = 'lawyer' }) {
   const [mailLoading, setMailLoading] = useState(isAdmin);
   const [mailError, setMailError] = useState('');
   const [action, setAction] = useState(null); // 'reply' or 'forward'
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -3197,101 +3594,118 @@ export function EmailPage({ toast, openModal, role = 'lawyer' }) {
     setAction(null);
   };
 
-  const inbox = commList;
+  const inbox = commList.filter(e => 
+    e.from.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    e.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    e.preview.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (isAdmin && mailLoading) {
     return (
-      <div className="animate-fade-in flex flex-col items-center justify-center min-h-[40vh] gap-3">
-        <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-[13px] text-slate-500">Loading communications…</p>
+      <div className="animate-fade-in flex flex-col items-center justify-center min-h-[50vh] gap-4">
+        <div className="w-10 h-10 border-4 border-[#0057c7] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[12px] text-[#8a94a6] font-900 uppercase tracking-widest opacity-60">Syncing Communications...</p>
       </div>
     );
   }
 
   if (isAdmin && mailError) {
     return (
-      <div className="animate-fade-in space-y-4">
-        <Card className="border-red-200 bg-red-50/50">
-          <p className="text-[13px] text-red-800 font-600">{mailError}</p>
+      <div className="animate-fade-in py-12">
+        <Card className="border-red-500/20 bg-red-500/5 max-w-lg mx-auto text-center">
+          <p className="text-[13px] text-red-400 font-600">{mailError}</p>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in space-y-4">
-      <PageHeader title="Email" subtitle="View and manage communications">
-        <button onClick={() => openModal('compose-email')} className="btn btn-primary">✏️ Compose</button>
+    <div className="animate-fade-in space-y-6">
+      <PageHeader title="Intelligence Hub" subtitle="Real-time communication & outreach monitoring">
+        <button onClick={() => openModal('compose-email')} className="btn btn-primary h-11 px-6 text-[11px] font-900 uppercase tracking-widest flex items-center gap-2 group">
+          <svg className="w-4 h-4 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+          Compose Outbound
+        </button>
       </PageHeader>
 
-      <Card noPad className="overflow-hidden">
-        <div className="flex" style={{ height: '520px' }}>
-          {/* Email List */}
-          <div className="w-72 flex-shrink-0 border-r border-slate-100 flex flex-col">
-            <div className="p-3 border-b border-slate-100">
-              <SearchInput placeholder="Search emails..." value="" onChange={() => { }} />
+      <Card noPad className="overflow-hidden border-white/5 bg-white/[0.02] backdrop-blur-xl">
+        <div className="flex" style={{ height: '640px' }}>
+          {/* Global Inbox Sidebar */}
+          <div className="w-80 flex-shrink-0 border-r border-white/5 flex flex-col bg-white/[0.01]">
+            <div className="p-4 border-b border-white/5 bg-white/[0.02]">
+              <SearchInput 
+                placeholder="Search transmissions..." 
+                value={searchQuery} 
+                onChange={(val) => setSearchQuery(val)} 
+              />
             </div>
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
               {inbox.map(e => (
                 <div key={e.id} onClick={() => { setSelected(e); setAction(null); }}
-                  className={`px-4 py-3 cursor-pointer border-b border-slate-50 transition-colors hover:bg-slate-50 ${selected?.id === e.id ? 'bg-primary-50 border-l-2 border-l-primary-500' : ''}`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className={`text-[13px] ${!e.read ? 'font-700 text-slate-900' : 'font-500 text-slate-700'}`}>{e.from}</span>
-                    <span className="text-[10px] text-slate-400 flex-shrink-0">{e.time}</span>
+                  className={`px-5 py-4 cursor-pointer border-b border-white/5 transition-all relative group ${selected?.id === e.id ? 'bg-[#0057c7]/10' : 'hover:bg-white/[0.03]'}`}>
+                  {selected?.id === e.id && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#38bdf8] shadow-[0_0_15px_#38bdf8]" />}
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className={`text-[13px] tracking-tight ${!e.read ? 'font-900 text-white' : 'font-800 text-white/70'}`}>{e.from}</span>
+                    <span className="text-[10px] font-900 text-[#8a94a6] uppercase tracking-tighter opacity-40">{e.time}</span>
                   </div>
-                  <p className="text-[12px] text-slate-600 truncate">{e.subject}</p>
-                  <p className="text-[11px] text-slate-400 truncate mt-0.5">{e.preview}</p>
-                  {!e.read && <div className="w-1.5 h-1.5 bg-primary-500 rounded-full mt-1" />}
+                  <p className="text-[12px] font-900 text-[#38bdf8] truncate tracking-tight mb-1">{e.subject}</p>
+                  <p className="text-[11px] font-500 text-[#8a94a6] truncate opacity-60 leading-relaxed">{e.preview}</p>
+                  {!e.read && <div className="absolute right-4 bottom-4 w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_8px_#10b981]" />}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Email Preview */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-white">
+          {/* Secure Message Environment */}
+          <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
             {selected ? (
               <>
-                <div className="p-4 border-b border-slate-100">
-                  <h3 className="text-[16px] font-600 text-slate-900 mb-2">{selected.subject}</h3>
-                  <div className="flex items-center gap-3">
-                    <Avatar initials={selected.from.charAt(0)} size="sm" />
-                    <div className="flex-1">
-                      <p className="text-[13px] font-500">{selected.from}</p>
-                      <p className="text-[11px] text-slate-400">{selected.time}</p>
-                    </div>
+                <div className="p-6 border-b border-white/5 bg-white/[0.03]">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-[18px] font-900 text-white tracking-tighter">{selected.subject}</h3>
                     <div className="flex gap-2">
-                      <button onClick={() => setAction('reply')} className={`btn btn-xs ${action === 'reply' ? 'btn-primary' : 'btn-secondary'}`}>Reply</button>
-                      <button onClick={() => setAction('forward')} className={`btn btn-xs ${action === 'forward' ? 'btn-primary' : 'btn-secondary'}`}>Forward</button>
+                      <button onClick={() => setAction('reply')} className={`h-9 px-4 rounded-xl text-[10px] font-900 uppercase tracking-widest transition-all ${action === 'reply' ? 'bg-[#0057c7] text-white' : 'bg-white/5 text-white hover:bg-white/10 border border-white/10'}`}>Reply</button>
+                      <button onClick={() => setAction('forward')} className={`h-9 px-4 rounded-xl text-[10px] font-900 uppercase tracking-widest transition-all ${action === 'forward' ? 'bg-[#0057c7] text-white' : 'bg-white/5 text-white hover:bg-white/10 border border-white/10'}`}>Forward</button>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Avatar initials={selected.from.charAt(0)} size="md" className="ring-2 ring-[#0057c7]/20" />
+                    <div className="flex-1">
+                      <p className="text-[14px] font-900 text-white tracking-tight">{selected.from}</p>
+                      <p className="text-[10px] font-900 text-[#8a94a6] uppercase tracking-[0.2em] opacity-40">Verification Timestamp: {selected.time}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 bg-slate-50 space-y-4">
-                  <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-                    <p className="text-[13px] text-slate-700 leading-relaxed whitespace-pre-line">{selected.body}</p>
+                <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-white/[0.01]">
+                  <div className="bg-white/[0.03] p-8 rounded-[2rem] border border-white/5 shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#0057c7]/5 blur-3xl pointer-events-none group-hover:bg-[#0057c7]/10 transition-all duration-1000" />
+                    <p className="text-[14px] text-white/80 font-500 leading-relaxed whitespace-pre-line relative z-10">{selected.body}</p>
                   </div>
 
                   {action && (
-                    <div className="animate-slide-up bg-white rounded-xl border border-primary-100 shadow-lg overflow-hidden">
-                      <div className="bg-primary-50 px-4 py-2 border-b border-primary-100 flex items-center justify-between">
-                        <span className="text-[11px] font-700 text-primary-700 uppercase tracking-wider">
-                          {action === 'reply' ? 'Quick Reply' : 'Forward Email'}
+                    <div className="animate-slide-up bg-[#0b1f3a] rounded-[2.5rem] border border-white/10 shadow-3xl overflow-hidden">
+                      <div className="bg-white/[0.05] px-6 py-4 border-b border-white/5 flex items-center justify-between">
+                        <span className="text-[11px] font-900 text-[#38bdf8] uppercase tracking-[0.2em]">
+                          {action === 'reply' ? 'Institutional Response' : 'Strategic Forwarding'}
                         </span>
-                        <button onClick={() => setAction(null)} className="text-primary-400 hover:text-primary-600">✕</button>
+                        <button onClick={() => setAction(null)} className="w-8 h-8 rounded-full flex items-center justify-center text-[#8a94a6] hover:text-white transition-colors">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
                       </div>
-                      <div className="p-4 space-y-3">
+                      <div className="p-8 space-y-5">
                         {action === 'forward' && (
-                          <Field label="Forward to" required>
-                            <Input placeholder="recipient@example.com" required />
+                          <Field label="Target Recipient" required>
+                            <Input placeholder="institutional.entity@domain.com" required />
                           </Field>
                         )}
-                        <Field label={action === 'reply' ? 'Your Message' : 'Message (Optional)'} required={action === 'reply'}>
-                          <Textarea rows={4} placeholder={action === 'reply' ? 'Type your reply here...' : 'Add a note to this forward...'} required={action === 'reply'} />
+                        <Field label={action === 'reply' ? 'Draft Statement' : 'Transmission Notes'} required={action === 'reply'}>
+                          <Textarea rows={6} placeholder={action === 'reply' ? 'Formulate institutional response...' : 'Append executive context to this forwarding...'} required={action === 'reply'} />
                         </Field>
-                        <div className="flex justify-end gap-2">
-                          <button onClick={() => setAction(null)} className="btn btn-secondary btn-sm">Cancel</button>
-                          <button onClick={handleSend} className="btn btn-primary btn-sm">
-                            {action === 'reply' ? 'Send Reply' : 'Forward Email'}
+                        <div className="flex justify-end gap-3 pt-2">
+                          <button onClick={() => setAction(null)} className="h-11 px-6 rounded-2xl bg-white/5 text-white text-[11px] font-900 uppercase tracking-widest hover:bg-white/10 transition-all">Cancel</button>
+                          <button onClick={handleSend} className="btn btn-primary h-11 px-8 text-[11px] font-900 uppercase tracking-widest">
+                            {action === 'reply' ? 'Execute Reply' : 'Execute Forward'}
                           </button>
                         </div>
                       </div>
@@ -3299,7 +3713,15 @@ export function EmailPage({ toast, openModal, role = 'lawyer' }) {
                   )}
                 </div>
               </>
-            ) : <EmptyState icon="📨" title="Select an email" desc="Click an email to read it" />}
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                <div className="w-20 h-20 rounded-[2rem] bg-white/[0.03] border border-white/5 flex items-center justify-center mb-6">
+                  <svg className="w-10 h-10 text-[#8a94a6] opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path d="M3 8l7.89 5.26a2 2 0 002.22 0L22 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                </div>
+                <h4 className="text-[18px] font-900 text-white tracking-tighter mb-2">Initialize Communication Overview</h4>
+                <p className="text-[13px] text-[#8a94a6] max-w-xs mx-auto opacity-60">Select an active transmission from the sidebar to begin institutional review.</p>
+              </div>
+            )}
           </div>
         </div>
       </Card>
@@ -3400,27 +3822,27 @@ export function UsersPage({ toast, openModal }) {
 
   if (loading) {
     return (
-      <div className="animate-fade-in flex flex-col items-center justify-center min-h-[40vh] gap-3">
-        <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-[13px] text-slate-500">Loading users…</p>
+      <div className="animate-fade-in flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <div className="w-12 h-12 border-4 border-[#0057c7] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[12px] text-[#8a94a6] font-900 uppercase tracking-[0.3em] opacity-60">Synchronizing Staff Records...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="animate-fade-in space-y-4">
-        <Card className="border-red-200 bg-red-50/50">
-          <p className="text-[13px] text-red-800 font-600">{error}</p>
-          <button type="button" onClick={loadUsers} className="btn btn-secondary btn-sm mt-3">Retry</button>
+      <div className="animate-fade-in py-12">
+        <Card className="border-[#ef4444]/20 bg-[#ef4444]/5 text-center p-12 max-w-lg mx-auto">
+          <p className="text-[13px] text-[#ef4444] font-900 uppercase tracking-widest">{error}</p>
+          <button type="button" onClick={loadUsers} className="btn btn-secondary mt-6 px-8">Re-establish Connection</button>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in space-y-4">
-      <PageHeader title="User Management" subtitle="Manage lawyers and administrators">
+    <div className="animate-fade-in space-y-6">
+      <PageHeader title="Staff Directory" subtitle="Administrative control and practitioner access management">
         <button onClick={() => openModal('add-user', null, async (values) => {
           try {
             const apiRole = values.roleLabel === 'Admin' ? 'admin' : 'lawyer';
@@ -3435,26 +3857,56 @@ export function UsersPage({ toast, openModal }) {
           } catch (e) {
             toast(e.message || 'Create failed', 'error');
           }
-        })} className="btn btn-primary">+ Add User</button>
+        })} className="btn btn-primary h-11 px-6 text-[11px] font-900 uppercase tracking-widest flex items-center gap-2">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+          Initialize Account
+        </button>
       </PageHeader>
-      <Table headers={['User', 'Email', 'Role', 'Cases', 'Status', 'Last Login', '']}>
-        {users.map(u => (
-          <Tr key={u.id}>
-            <Td><div className="flex items-center gap-2.5"><Avatar initials={u.avatar} size="sm" /><div><p className="font-500 text-slate-900">{u.name}</p><p className="text-[11px] text-slate-400">{u.id}</p></div></div></Td>
-            <Td className="text-slate-500">{u.email}</Td>
-            <Td><span className={`text-[11px] font-600 px-2 py-0.5 rounded-full ${u.roleLabel === 'Admin' ? 'bg-accent-50 text-accent-700' : 'bg-blue-50 text-blue-700'}`}>{u.roleLabel}</span></Td>
-            <Td className="font-600">{u.cases || '–'}</Td>
-            <Td><Badge status={u.status} /></Td>
-            <Td className="text-[12px] text-slate-400">{u.lastLogin}</Td>
-            <Td>
-              <div className="flex gap-1">
-                <button onClick={() => handleEdit(u)} className="btn btn-secondary p-1.5" title="Edit">✏️</button>
-                <button onClick={() => handleDelete(u)} className="btn btn-danger p-1.5" title="Delete">🗑</button>
-              </div>
-            </Td>
-          </Tr>
-        ))}
-      </Table>
+
+      <div className="card overflow-hidden border-white/5 bg-white/[0.02] backdrop-blur-xl rounded-[2rem]">
+        <Table headers={['Practitioner', 'Secure Email', 'Role', 'Matters', 'Status', 'Last Activity', 'Actions']}>
+          {users.map(u => (
+            <Tr key={u.id}>
+              <Td>
+                <div className="flex items-center gap-3">
+                  <Avatar initials={u.avatar} size="md" className="ring-2 ring-white/5 shadow-2xl" />
+                  <div>
+                    <p className="text-[14px] font-900 text-white tracking-tight">{u.name}</p>
+                    <p className="text-[10px] text-[#38bdf8] font-900 uppercase tracking-widest opacity-60">ID-{String(u.id).slice(-4).toUpperCase()}</p>
+                  </div>
+                </div>
+              </Td>
+              <Td><span className="text-[13px] font-600 text-white/70">{u.email}</span></Td>
+              <Td>
+                <span className={`text-[10px] font-900 px-3 py-1 rounded-lg uppercase tracking-[0.1em] border shadow-sm ${
+                  u.roleLabel === 'Admin' 
+                    ? 'bg-[#C9A24A]/10 text-[#C9A24A] border-[#C9A24A]/20' 
+                    : u.roleLabel === 'Lawyer'
+                    ? 'bg-[#38bdf8]/10 text-[#38bdf8] border-[#38bdf8]/20'
+                    : 'bg-white/5 text-[#8a94a6] border-white/10'
+                }`}>
+                  {u.roleLabel}
+                </span>
+              </Td>
+              <Td><span className="text-[14px] font-900 text-white">{u.cases || '—'}</span></Td>
+              <Td><Badge status={u.status} /></Td>
+              <Td><span className="text-[12px] font-600 text-[#8a94a6]">{u.lastLogin}</span></Td>
+              <Td>
+                <div className="flex gap-2.5">
+                  <button onClick={() => handleEdit(u)} 
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-[#8a94a6] hover:bg-[#38bdf8]/10 hover:text-[#38bdf8] hover:border-[#38bdf8]/30 hover:shadow-[0_0_15px_rgba(56,189,248,0.2)] transition-all border border-white/10 group" title="Edit Practitioner">
+                    <svg className="w-5 h-5 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  </button>
+                  <button onClick={() => handleDelete(u)} 
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-[#8a94a6] hover:bg-[#ef4444]/10 hover:text-[#ef4444] hover:border-[#ef4444]/30 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all border border-white/10 group" title="Terminate Access">
+                    <svg className="w-5 h-5 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                </div>
+              </Td>
+            </Tr>
+          ))}
+        </Table>
+      </div>
     </div>
   );
 }
@@ -3484,7 +3936,6 @@ export function SettingsPage({ toast }) {
     try {
       await api.settings.update(settings);
       toast('Firm settings saved successfully!', 'success');
-      // Trigger a global change event if needed
       window.dispatchEvent(new CustomEvent('vktori:entities-changed'));
     } catch (e) {
       toast(e.message || 'Failed to save settings', 'error');
@@ -3506,230 +3957,162 @@ export function SettingsPage({ toast }) {
   ];
 
   return (
-    <div className="animate-fade-in space-y-4">
-      <PageHeader title="Firm Settings" subtitle="Configure VkTori to match your practice" />
+    <div className="animate-fade-in space-y-6 pb-20">
+      <PageHeader title="Firm Configuration" subtitle="Neural control center for firm protocols and operational settings" />
 
       <Tabs tabs={['Firm Profile', 'Integrations', 'Social Links', 'Security', 'Billing Setup', 'Notifications']} active={activeTab} onChange={setActiveTab} />
 
       {activeTab === 'Firm Profile' && (
-        <Card className="max-w-3xl">
-          <div className="flex items-center gap-6 mb-8 pb-8 border-b border-slate-100">
-            <div className="w-20 h-20 rounded-2xl bg-primary-600 flex items-center justify-center text-3xl text-white shadow-xl shadow-primary-500/20">
-              {String(settings.firm_name || 'V')[0]}
+        <Card className="max-w-3xl border-white/5 bg-white/[0.02] backdrop-blur-xl rounded-[2.5rem] p-10">
+          <div className="flex items-center gap-8 mb-10 pb-10 border-b border-white/5">
+            <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-[#0057c7] to-[#0B1F3A] flex items-center justify-center text-4xl text-white font-900 shadow-[0_15px_40px_rgba(0,87,199,0.3)] border border-white/10 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative z-10 drop-shadow-2xl">{String(settings.firm_name || 'V')[0]}</span>
             </div>
             <div>
-              <h3 className="text-xl font-800 text-slate-900 font-display">{settings.firm_name || 'VkTori Legal'}</h3>
-              <p className="text-[14px] text-slate-500">Legal ERP Configuration</p>
-
+              <h3 className="text-[22px] font-900 text-white font-display tracking-tight leading-none mb-2">{settings.firm_name || 'VkTori Legal'}</h3>
+              <p className="text-[11px] text-[#8a94a6] font-900 uppercase tracking-[0.3em] opacity-60">Strategic Firm Configuration</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Law Firm Name"><Input value={settings.firm_name || ''} onChange={e => updateSetting('firm_name', e.target.value)} /></Field>
-            <Field label="Practice Specialization"><Input value={settings.specialty || ''} onChange={e => updateSetting('specialty', e.target.value)} /></Field>
-            <Field label="Primary Email"><Input value={settings.email || ''} onChange={e => updateSetting('email', e.target.value)} /></Field>
-            <Field label="Phone Number"><Input value={settings.phone || ''} onChange={e => updateSetting('phone', e.target.value)} /></Field>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Field label="Law Firm Entity"><Input value={settings.firm_name || ''} onChange={e => updateSetting('firm_name', e.target.value)} placeholder="Full legal name" /></Field>
+            <Field label="Practice Specialization"><Input value={settings.specialty || ''} onChange={e => updateSetting('specialty', e.target.value)} placeholder="Main practice area" /></Field>
+            <Field label="Primary Secure Email"><Input value={settings.email || ''} onChange={e => updateSetting('email', e.target.value)} placeholder="administrative@firm.com" /></Field>
+            <Field label="Global Phone Link"><Input value={settings.phone || ''} onChange={e => updateSetting('phone', e.target.value)} placeholder="+1 (000) 000-0000" /></Field>
             <div className="md:col-span-2">
-              <Field label="Default Billing Rate ($/hr)"><Input type="number" value={settings.billing_rate || ''} onChange={e => updateSetting('billing_rate', e.target.value)} /></Field>
+              <Field label="Standard Hourly Rate ($/HR)"><Input type="number" value={settings.billing_rate || ''} onChange={e => updateSetting('billing_rate', e.target.value)} placeholder="e.g. 350" /></Field>
             </div>
           </div>
-          <div className="flex justify-end mt-8 border-t border-slate-100 pt-4">
-            <button
-              onClick={handleSave}
-              disabled={loading}
-              className="btn btn-primary px-8"
-            >
-              {loading ? 'Saving...' : 'Save Changes'}
+          <div className="flex justify-end mt-10 pt-6 border-t border-white/5">
+            <button onClick={handleSave} disabled={loading} className="h-12 px-10 rounded-2xl bg-[#0057c7] text-white text-[11px] font-900 uppercase tracking-widest hover:bg-[#004bb1] transition-all shadow-[0_10px_30px_rgba(0,87,199,0.3)] disabled:opacity-50">
+              {loading ? 'Reconciling...' : 'Save Configuration'}
             </button>
           </div>
         </Card>
       )}
 
       {activeTab === 'Integrations' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {integrationCards.map((item) => (
-            <Card key={item.title} className="flex flex-col gap-4">
+            <Card key={item.title} className="flex flex-col gap-6 border-white/5 bg-white/[0.02] backdrop-blur-xl p-8 rounded-[2rem] group hover:border-[#38bdf8]/30 transition-all overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#0057c7]/5 blur-3xl group-hover:bg-[#0057c7]/10 transition-all pointer-events-none" />
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <h3 className="text-[15px] font-800 text-slate-900">{item.title}</h3>
-                  <p className="text-[12px] text-slate-500 mt-1 leading-relaxed">{item.subtitle}</p>
+                  <h3 className="text-[15px] font-900 text-white tracking-tight leading-none mb-2">{item.title}</h3>
+                  <p className="text-[12px] text-[#8a94a6] font-500 leading-relaxed opacity-70">{item.subtitle}</p>
                 </div>
-                <span
-                  className={`flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-lg text-[10px] font-700 uppercase tracking-wider border ${item.connected
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                      : 'bg-slate-100 text-slate-600 border-slate-200'
-                    }`}
-                >
-                  {item.connected ? 'Connected' : 'Disconnected'}
+                <span className={`flex-shrink-0 inline-flex items-center px-3 py-1 rounded-lg text-[9px] font-900 uppercase tracking-widest border transition-all ${item.connected ? 'bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : 'bg-white/5 text-[#8a94a6] border-white/10 opacity-50'}`}>
+                  {item.connected ? 'Active Sync' : 'Offline'}
                 </span>
               </div>
-              <div className="flex justify-end pt-3 mt-auto border-t border-slate-100">
-                {item.connected ? (
-                  <button type="button" onClick={integrationPlaceholder} className="btn btn-secondary btn-sm">
-                    Disconnect
-                  </button>
-                ) : (
-                  <button type="button" onClick={integrationPlaceholder} className="btn btn-primary btn-sm">
-                    Connect Service
-                  </button>
-                )}
+              <div className="flex justify-end pt-5 mt-auto border-t border-white/5">
+                <button type="button" onClick={integrationPlaceholder} className={`h-9 px-4 rounded-xl text-[10px] font-900 uppercase tracking-widest transition-all ${item.connected ? 'bg-white/5 text-[#8a94a6] hover:bg-[#ef4444]/10 hover:text-[#ef4444]' : 'bg-[#0057c7] text-white hover:bg-[#004bb1] shadow-lg shadow-[#0057c7]/20'}`}>
+                  {item.connected ? 'Disconnect' : 'Connect'}
+                </button>
               </div>
             </Card>
           ))}
         </div>
       )}
       
-      {activeTab === 'Social Links' && (
-        <SocialLinksSettings toast={toast} />
-      )}
+      {activeTab === 'Social Links' && <SocialLinksSettings toast={toast} />}
 
       {activeTab === 'Security' && (
-        <Card className="max-w-3xl">
-          <h3 className="text-base font-700 text-slate-900 mb-4">Change Password</h3>
-          <div className="space-y-4">
-            <Field label="Current Password">
-              <Input
-                type="password"
-                placeholder="••••••••"
-                value={passwordForm.currentPassword}
-                onChange={e => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
-              />
-            </Field>
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="New Password">
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  value={passwordForm.newPassword}
-                  onChange={e => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                />
-              </Field>
-              <Field label="Confirm Password">
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  value={passwordForm.confirmPassword}
-                  onChange={e => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                />
-              </Field>
+        <Card className="max-w-3xl border-white/5 bg-white/[0.02] backdrop-blur-xl rounded-[2rem] p-10">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 rounded-xl bg-[#0057c7]/10 flex items-center justify-center text-[#38bdf8]">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+            </div>
+            <h3 className="text-[11px] font-900 text-white uppercase tracking-[0.3em]">Access Credentials</h3>
+          </div>
+          <div className="space-y-6">
+            <Field label="Current Authorization Password"><Input type="password" placeholder="••••••••" value={passwordForm.currentPassword} onChange={e => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))} /></Field>
+            <div className="grid grid-cols-2 gap-6">
+              <Field label="New Secure Password"><Input type="password" placeholder="••••••••" value={passwordForm.newPassword} onChange={e => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))} /></Field>
+              <Field label="Confirm Synchronization"><Input type="password" placeholder="••••••••" value={passwordForm.confirmPassword} onChange={e => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))} /></Field>
             </div>
           </div>
-          <div className="flex justify-end mt-6 pt-4 border-t border-slate-100">
-            <button
-              onClick={async () => {
-                if (!passwordForm.currentPassword || !passwordForm.newPassword) {
-                  return toast('Please fill in all password fields', 'error');
-                }
-                if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-                  return toast('Passwords do not match', 'error');
-                }
+          <div className="flex justify-end mt-10 pt-6 border-t border-white/5">
+            <button onClick={async () => {
+                if (!passwordForm.currentPassword || !passwordForm.newPassword) return toast('Please fill in all password fields', 'error');
+                if (passwordForm.newPassword !== passwordForm.confirmPassword) return toast('Passwords do not match', 'error');
                 try {
                   setLoading(true);
-                  await api.auth.changePassword({
-                    currentPassword: passwordForm.currentPassword,
-                    newPassword: passwordForm.newPassword
-                  });
+                  await api.auth.changePassword({ currentPassword: passwordForm.currentPassword, newPassword: passwordForm.newPassword });
                   toast('Password updated successfully!', 'success');
                   setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-                } catch (e) {
-                  toast(e.message || 'Failed to update password', 'error');
-                } finally {
-                  setLoading(false);
-                }
-              }}
-              disabled={loading}
-              className="btn btn-primary px-8"
-            >
-              {loading ? 'Updating...' : 'Update Password'}
+                } catch (e) { toast(e.message || 'Failed to update password', 'error'); } finally { setLoading(false); }
+              }} disabled={loading} className="h-12 px-10 rounded-2xl bg-[#0057c7] text-white text-[11px] font-900 uppercase tracking-widest hover:bg-[#004bb1] transition-all shadow-[0_10px_30px_rgba(0,87,199,0.3)] disabled:opacity-50">
+              {loading ? 'Updating Vault...' : 'Reset Credentials'}
             </button>
           </div>
         </Card>
       )}
 
       {activeTab === 'Billing Setup' && (
-        <Card className="max-w-3xl">
-          <h3 className="text-base font-700 text-slate-900 mb-6">Billing Preferences</h3>
-          <div className="space-y-6">
-            <Field label="Primary Billing Email">
-              <Input
-                value={settings.billing_email || ''}
-                onChange={e => updateSetting('billing_email', e.target.value)}
-                placeholder="billing@yourfirm.com"
-              />
-            </Field>
-            <div className="space-y-4">
+        <Card className="max-w-3xl border-white/5 bg-white/[0.02] backdrop-blur-xl rounded-[2rem] p-10">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 rounded-xl bg-[#10b981]/10 flex items-center justify-center text-[#10b981]">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3 1.343 3 3-1.343 3-3 3m0-12c1.657 0 3 1.343 3 3s-1.343 3-3 3-3-1.343-3-3 1.343-3 3-3m0-4v2m0 16v2" /></svg>
+            </div>
+            <h3 className="text-[11px] font-900 text-white uppercase tracking-[0.3em]">Billing Infrastructure</h3>
+          </div>
+          <div className="space-y-8">
+            <Field label="Primary Fiscal Email"><Input value={settings.billing_email || ''} onChange={e => updateSetting('billing_email', e.target.value)} placeholder="billing@yourfirm.com" /></Field>
+            <div className="space-y-5">
               {[
-                { key: 'auto_invoice', label: 'Auto-Invoice per Case', desc: 'Generate a base invoice automatically when a case is created.' },
-                { key: 'storage_overages', label: 'Cloud Storage Overages', desc: 'Automatically charge for storage usage beyond the 500GB limit.' },
-                { key: 'tax_compliance', label: 'Tax Compliance Receipts', desc: 'Send VAT/Tax compliant PDF receipts for every transaction.' },
+                { key: 'auto_invoice', label: 'Automated Case Invoicing', desc: 'Generate system-base invoices upon matter initialization.' },
+                { key: 'storage_overages', label: 'Neural Storage Capacity', desc: 'Automatic scaling for firm data exceeding 500GB institutional limit.' },
+                { key: 'tax_compliance', label: 'Fiscal Compliance Protocol', desc: 'Generate high-fidelity PDF receipts for all transactional activities.' },
               ].map((pref) => {
                 const isEnabled = settings[pref.key] === 'true' || settings[pref.key] === true;
                 return (
-                  <div key={pref.key} className="flex items-start justify-between gap-4 p-3 hover:bg-slate-50 rounded-xl transition-colors">
-                    <div>
-                      <p className="text-[13px] font-700 text-slate-900">{pref.label}</p>
-                      <p className="text-[11px] text-slate-500">{pref.desc}</p>
+                  <div key={pref.key} className="flex items-start justify-between gap-4 p-4 hover:bg-white/5 rounded-2xl border border-transparent hover:border-white/5 transition-all group">
+                    <div className="flex-1">
+                      <p className="text-[14px] font-900 text-white tracking-tight group-hover:text-[#10b981] transition-colors">{pref.label}</p>
+                      <p className="text-[11px] text-[#8a94a6] mt-1 leading-relaxed opacity-60">{pref.desc}</p>
                     </div>
-                    <div
-                      onClick={() => updateSetting(pref.key, !isEnabled ? 'true' : 'false')}
-                      className={`w-10 h-5 rounded-full relative cursor-pointer shadow-sm transition-all duration-200 flex-shrink-0 ${isEnabled ? 'bg-emerald-500' : 'bg-slate-300'
-                        }`}
-                    >
-                      <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all duration-200 ${isEnabled ? 'left-[23px]' : 'left-1'
-                        }`} />
+                    <div onClick={() => updateSetting(pref.key, !isEnabled ? 'true' : 'false')} className={`w-11 h-6 rounded-full relative cursor-pointer shadow-inner transition-all duration-300 flex-shrink-0 ${isEnabled ? 'bg-[#10b981] shadow-[0_0_15px_rgba(16,185,129,0.4)]' : 'bg-white/10'}`}>
+                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 cubic-bezier(0.34, 1.56, 0.64, 1) ${isEnabled ? 'left-[23px]' : 'left-1'}`} />
                     </div>
                   </div>
                 );
               })}
             </div>
           </div>
-          <div className="flex justify-end mt-8 pt-4 border-t border-slate-100">
-            <button
-              onClick={handleSave}
-              disabled={loading}
-              className="btn btn-primary px-8"
-            >
-              {loading ? 'Saving...' : 'Save Preferences'}
+          <div className="flex justify-end mt-10 pt-6 border-t border-white/5">
+            <button onClick={handleSave} disabled={loading} className="h-12 px-10 rounded-2xl bg-[#0057c7] text-white text-[11px] font-900 uppercase tracking-widest hover:bg-[#004bb1] transition-all shadow-[0_10px_30px_rgba(0,87,199,0.3)] disabled:opacity-50">
+              {loading ? 'Saving...' : 'Sync Billing Preferences'}
             </button>
           </div>
         </Card>
       )}
+
       {activeTab === 'Notifications' && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <h3 className="text-base font-700 text-slate-900 mb-6 flex items-center gap-2">
-                <span className="text-xl">📩</span> Email Notifications
+        <div className="space-y-6 max-w-5xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <Card className="border-white/5 bg-white/[0.02] backdrop-blur-xl p-8 rounded-[2.5rem]">
+              <h3 className="text-[11px] font-900 text-white uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-[#0057c7]/10 flex items-center justify-center text-[#38bdf8]"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg></div>
+                Secure Outbound Alerts
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {[
-                  {
-                    group: 'Matter Management', items: [
-                      { key: 'notify_new_lead', label: 'New Intake Lead', desc: 'Notify when a new lead is captured via website.' },
-                    ]
-                  },
-                  {
-                    group: 'Client Communication', items: [
-                      { key: 'notify_direct_message', label: 'Direct Message', desc: 'Notify on receiving an encrypted portal message.' },
-                    ]
-                  }
+                  { group: 'Operational Logic', items: [{ key: 'notify_new_lead', label: 'Inbound Intelligence', desc: 'Notify upon new lead acquisition via digital portal.' }] },
+                  { group: 'Client Connectivity', items: [{ key: 'notify_direct_message', label: 'Encrypted Transmission', desc: 'Alert upon receiving an encrypted client portal message.' }] }
                 ].map((group, gi) => (
-                  <div key={gi} className="space-y-3 pt-2 first:pt-0">
-                    <p className="text-[11px] font-800 text-slate-400 uppercase tracking-widest">{group.group}</p>
+                  <div key={gi} className="space-y-4">
+                    <p className="text-[10px] font-900 text-[#8a94a6] uppercase tracking-[0.2em] opacity-40 ml-1">{group.group}</p>
                     {group.items.map((item) => {
                       const isEnabled = settings[item.key] === 'true' || settings[item.key] === true;
                       return (
-                        <div key={item.key} className="flex items-start justify-between gap-4 p-2.5 hover:bg-slate-50 rounded-xl transition-colors group">
+                        <div key={item.key} className="flex items-start justify-between gap-4 p-3.5 hover:bg-white/5 rounded-2xl border border-transparent hover:border-white/5 transition-all group">
                           <div>
-                            <p className="text-[13px] font-700 text-slate-800">{item.label}</p>
-                            <p className="text-[11px] text-slate-500">{item.desc}</p>
+                            <p className="text-[14px] font-900 text-white tracking-tight group-hover:text-[#38bdf8] transition-colors">{item.label}</p>
+                            <p className="text-[11px] text-[#8a94a6] mt-1 leading-relaxed opacity-60">{item.desc}</p>
                           </div>
-                          <div
-                            onClick={() => updateSetting(item.key, !isEnabled ? 'true' : 'false')}
-                            className={`w-10 h-5 rounded-full relative cursor-pointer transition-all duration-200 flex-shrink-0 ${isEnabled ? 'bg-emerald-500' : 'bg-slate-300'
-                              }`}
-                          >
-                            <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all duration-200 ${isEnabled ? 'left-[23px]' : 'left-1'
-                              }`} />
+                          <div onClick={() => updateSetting(item.key, !isEnabled ? 'true' : 'false')} className={`w-11 h-6 rounded-full relative cursor-pointer shadow-inner transition-all duration-300 flex-shrink-0 ${isEnabled ? 'bg-[#38bdf8] shadow-[0_0_15px_rgba(56,189,248,0.4)]' : 'bg-white/10'}`}>
+                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 cubic-bezier(0.34, 1.56, 0.64, 1) ${isEnabled ? 'left-[23px]' : 'left-1'}`} />
                           </div>
                         </div>
                       );
@@ -3739,45 +4122,35 @@ export function SettingsPage({ toast }) {
               </div>
             </Card>
 
-            <div className="space-y-6">
-              <Card>
-                <h3 className="text-base font-700 text-slate-900 mb-6 flex items-center gap-2">
-                  <span className="text-xl">⚙️</span> System Alerts
-                </h3>
-                <div className="space-y-4">
-                  {[
-                    { key: 'notify_matter_deadlines', label: 'Matter Deadlines', desc: 'Reminders for court dates and filing requirements.' },
-                    { key: 'notify_task_assignments', label: 'Task Assignments', desc: 'Notify when a new internal task is delegated.' },
-                  ].map((item) => {
-                    const isEnabled = settings[item.key] === 'true' || settings[item.key] === true;
-                    return (
-                      <div key={item.key} className="flex items-start justify-between gap-4 p-2.5 hover:bg-slate-50 rounded-xl transition-colors">
-                        <div>
-                          <p className="text-[13px] font-700 text-slate-800">{item.label}</p>
-                          <p className="text-[11px] text-slate-500">{item.desc}</p>
-                        </div>
-                        <div
-                          onClick={() => updateSetting(item.key, !isEnabled ? 'true' : 'false')}
-                          className={`w-10 h-5 rounded-full relative cursor-pointer transition-all duration-200 flex-shrink-0 ${isEnabled ? 'bg-emerald-500' : 'bg-slate-300'
-                            }`}
-                        >
-                          <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all duration-200 ${isEnabled ? 'left-[23px]' : 'left-1'
-                            }`} />
-                        </div>
+            <Card className="border-white/5 bg-white/[0.02] backdrop-blur-xl p-8 rounded-[2.5rem]">
+              <h3 className="text-[11px] font-900 text-white uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-[#f59e0b]/10 flex items-center justify-center text-[#f59e0b]"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg></div>
+                Institutional Protocols
+              </h3>
+              <div className="space-y-6">
+                {[
+                  { key: 'notify_matter_deadlines', label: 'Deadlines Audit', desc: 'Real-time reminders for critical court dates and filing mandates.' },
+                  { key: 'notify_task_assignments', label: 'Command Delegation', desc: 'Alert when a new internal operational task is delegated.' },
+                ].map((item) => {
+                  const isEnabled = settings[item.key] === 'true' || settings[item.key] === true;
+                  return (
+                    <div key={item.key} className="flex items-start justify-between gap-4 p-3.5 hover:bg-white/5 rounded-2xl border border-transparent hover:border-white/5 transition-all group">
+                      <div>
+                        <p className="text-[14px] font-900 text-white tracking-tight group-hover:text-[#f59e0b] transition-colors">{item.label}</p>
+                        <p className="text-[11px] text-[#8a94a6] mt-1 leading-relaxed opacity-60">{item.desc}</p>
                       </div>
-                    );
-                  })}
-                </div>
-              </Card>
-            </div>
+                      <div onClick={() => updateSetting(item.key, !isEnabled ? 'true' : 'false')} className={`w-11 h-6 rounded-full relative cursor-pointer shadow-inner transition-all duration-300 flex-shrink-0 ${isEnabled ? 'bg-[#f59e0b] shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'bg-white/10'}`}>
+                        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 cubic-bezier(0.34, 1.56, 0.64, 1) ${isEnabled ? 'left-[23px]' : 'left-1'}`} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
           </div>
-          <div className="flex justify-end pt-4 border-t border-slate-100">
-            <button
-              onClick={handleSave}
-              disabled={loading}
-              className="btn btn-primary px-8"
-            >
-              {loading ? 'Saving...' : 'Save Preferences'}
+          <div className="flex justify-end pt-6 border-t border-white/5">
+            <button onClick={handleSave} disabled={loading} className="h-12 px-10 rounded-2xl bg-[#0057c7] text-white text-[11px] font-900 uppercase tracking-widest hover:bg-[#004bb1] transition-all shadow-[0_10px_30px_rgba(0,87,199,0.3)] disabled:opacity-50">
+              {loading ? 'Saving...' : 'Sync Communication Protocols'}
             </button>
           </div>
         </div>
@@ -3814,54 +4187,59 @@ export function TemplateLibrary({ targetMatterId, onSelect }) {
   );
 
   if (loading) {
-    return <div className="p-12 text-center text-slate-500">Loading library...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center p-20 gap-4">
+        <div className="w-10 h-10 border-4 border-[#38bdf8] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[13px] text-[#8a94a6] font-600 animate-pulse">Accessing Secure Library...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="relative">
+    <div className="space-y-6">
+      <div className="relative group">
         <input
-          className="text-[13px] bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 w-full outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all"
-          placeholder="Search templates by title or category..."
+          className="text-[14px] bg-white/[0.03] border border-white/10 rounded-2xl pl-11 pr-4 py-3 w-full outline-none focus:border-[#38bdf8] focus:ring-4 focus:ring-[#0057c7]/20 text-white transition-all placeholder:text-white/20"
+          placeholder="Search global templates by title or category..."
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
-        <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        <svg className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-[#8a94a6] group-focus-within:text-[#38bdf8] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
       </div>
 
-      <div className="max-h-[400px] overflow-y-auto space-y-2 pr-1">
+      <div className="max-h-[450px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
         {filtered.length > 0 ? filtered.map(t => (
-          <div key={t.id} className="p-4 rounded-2xl border border-slate-100 bg-white hover:border-primary-300 hover:shadow-md transition-all group flex items-center justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-[14px] font-700 text-slate-900 group-hover:text-primary-600 transition-colors">{t.title}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[10px] font-800 px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 uppercase tracking-widest">{t.category || 'General'}</span>
-                <span className="text-[11px] text-slate-400">· from Matter #{t.matter_id}</span>
+          <div key={t.id} className="p-5 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-[#38bdf8]/30 transition-all group flex items-center justify-between gap-6 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#0057c7]/5 blur-3xl pointer-events-none group-hover:bg-[#0057c7]/10 transition-all" />
+            <div className="min-w-0 relative z-10">
+              <p className="text-[15px] font-800 text-white group-hover:text-[#38bdf8] transition-colors tracking-tight">{t.title}</p>
+              <div className="flex items-center gap-3 mt-2">
+                <span className="text-[9px] font-900 px-2.5 py-1 rounded-lg bg-[#0057c7]/10 text-[#38bdf8] border border-[#0057c7]/20 uppercase tracking-[0.15em]">{t.category || 'General'}</span>
+                <span className="text-[11px] text-[#8a94a6] font-700 opacity-60">· Matter Ref #{t.matter_id}</span>
               </div>
             </div>
-            <button
-              onClick={() => {
-                // We use the global openModal via window event or just call it if we have access.
-                // In this architecture, it's easier to just call the parent-provided openModal.
-                // But TemplateLibrary is rendered inside a Modal, so we need to trigger another modal.
+            <button onClick={() => {
                 window.dispatchEvent(new CustomEvent('vktori:open-modal', {
                   detail: { type: 'use-template', data: { ...t, targetMatterId } }
                 }));
-              }}
-              className="btn btn-primary btn-xs whitespace-nowrap"
-            >
+              }} className="btn btn-primary h-9 px-6 text-[11px] font-900 uppercase tracking-widest shadow-[#0057c7]/20 whitespace-nowrap relative z-10">
               Apply Template
             </button>
           </div>
         )) : (
-          <div className="py-12 text-center border-2 border-dashed border-slate-100 rounded-2xl">
-            <p className="text-[13px] text-slate-400">No matching templates found in the library.</p>
+          <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-3xl bg-white/[0.01]">
+            <div className="w-16 h-16 bg-white/[0.03] rounded-full flex items-center justify-center mx-auto mb-4 border border-white/5"><svg className="w-8 h-8 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg></div>
+            <p className="text-[14px] font-800 text-white opacity-40">No matching templates found</p>
           </div>
         )}
       </div>
     </div>
   );
 }
+
+// ─────────────────────────────────────────────────────────
+//  SOCIAL LINKS SETTINGS
+// ─────────────────────────────────────────────────────────
 export function SocialLinksSettings({ toast }) {
   const [links, setLinks] = useState([
     { platform: 'LinkedIn', url: '' },
@@ -3877,18 +4255,13 @@ export function SocialLinksSettings({ toast }) {
       try {
         const res = await api.marketing.getSocialLinks();
         if (res.success && res.data.length > 0) {
-          // Merge with defaults to ensure all platforms are present
           const merged = links.map(d => {
             const found = res.data.find(r => r.platform === d.platform);
             return found ? { ...d, url: found.url || '' } : d;
           });
           setLinks(merged);
         }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
+      } catch (e) { console.error(e); } finally { setLoading(false); }
     })();
   }, []);
 
@@ -3897,11 +4270,7 @@ export function SocialLinksSettings({ toast }) {
     try {
       await api.marketing.updateSocialLinks(links);
       toast('Social links updated successfully!', 'success');
-    } catch (e) {
-      toast(e.message || 'Failed to update links', 'error');
-    } finally {
-      setSaving(false);
-    }
+    } catch (e) { toast(e.message || 'Failed to update links', 'error'); } finally { setSaving(false); }
   };
 
   const updateUrl = (platform, url) => {
@@ -3910,14 +4279,11 @@ export function SocialLinksSettings({ toast }) {
 
   if (loading) {
     return (
-      <Card className="max-w-3xl">
+      <Card className="max-w-3xl border-white/5 bg-white/[0.02] backdrop-blur-xl rounded-[2.5rem] p-10">
         <div className="animate-pulse space-y-6">
-          <div className="h-6 w-48 bg-slate-200 rounded" />
-          <div className="h-4 w-full bg-slate-100 rounded" />
+          <div className="h-6 w-48 bg-white/5 rounded" />
           <div className="space-y-4">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-16 bg-slate-50 rounded-2xl" />
-            ))}
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-20 bg-white/5 rounded-2xl" />)}
           </div>
         </div>
       </Card>
@@ -3925,39 +4291,30 @@ export function SocialLinksSettings({ toast }) {
   }
 
   return (
-    <Card className="max-w-3xl">
-      <h3 className="text-base font-700 text-slate-900 mb-6">Social Media Presence</h3>
-      <p className="text-[13px] text-slate-500 mb-8 leading-relaxed">
-        Configure the social media URLs for your firm's public website. If a URL is left empty, the corresponding icon will be disabled on the website.
-      </p>
+    <Card className="max-w-3xl border-white/5 bg-white/[0.02] backdrop-blur-xl rounded-[2.5rem] p-10">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-10 h-10 rounded-xl bg-[#0057c7]/10 flex items-center justify-center text-[#38bdf8]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg></div>
+        <h3 className="text-[11px] font-900 text-white uppercase tracking-[0.3em]">Institutional Presence</h3>
+      </div>
+      <p className="text-[13px] text-[#8a94a6] mb-10 leading-relaxed opacity-70">Configure authenticated social identity links for the firm's public portal.</p>
       
       <div className="space-y-6">
         {links.map(link => (
-          <div key={link.platform} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center p-4 bg-slate-50/50 border border-slate-100 rounded-2xl">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">
-                {link.platform === 'LinkedIn' ? '💼' : link.platform === 'Instagram' ? '📸' : link.platform === 'Facebook' ? '👥' : '🎥'}
-              </span>
-              <span className="text-[14px] font-700 text-slate-700">{link.platform}</span>
+          <div key={link.platform} className="grid grid-cols-1 md:grid-cols-4 gap-6 items-center p-5 bg-white/[0.02] border border-white/5 rounded-2xl group hover:border-[#38bdf8]/30 transition-all">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-xl shadow-lg group-hover:scale-110 transition-transform">
+                {link.platform === 'LinkedIn' ? <svg className="w-5 h-5 text-[#0077b5]" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg> : link.platform === 'Instagram' ? <svg className="w-5 h-5 text-[#e1306c]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg> : link.platform === 'Facebook' ? <svg className="w-5 h-5 text-[#1877f2]" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> : <svg className="w-5 h-5 text-[#ff0000]" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>}
+              </div>
+              <span className="text-[14px] font-900 text-white tracking-tight">{link.platform}</span>
             </div>
-            <div className="md:col-span-3">
-              <Input 
-                placeholder={`https://${link.platform.toLowerCase()}.com/yourfirm`} 
-                value={link.url} 
-                onChange={e => updateUrl(link.platform, e.target.value)} 
-              />
-            </div>
+            <div className="md:col-span-3"><Input placeholder={`Authenticated path for ${link.platform}`} value={link.url} onChange={e => updateUrl(link.platform, e.target.value)} /></div>
           </div>
         ))}
       </div>
 
-      <div className="flex justify-end mt-8 pt-4 border-t border-slate-100">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="btn btn-primary px-8"
-        >
-          {saving ? 'Updating...' : 'Update Social Links'}
+      <div className="flex justify-end mt-10 pt-6 border-t border-white/5">
+        <button onClick={handleSave} disabled={saving} className="h-12 px-10 rounded-2xl bg-[#0057c7] text-white text-[11px] font-900 uppercase tracking-widest hover:bg-[#004bb1] transition-all shadow-[0_10px_30px_rgba(0,87,199,0.3)] disabled:opacity-50">
+          {saving ? 'Synchronizing...' : 'Update Social Protocols'}
         </button>
       </div>
     </Card>

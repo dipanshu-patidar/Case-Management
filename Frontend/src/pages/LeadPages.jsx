@@ -93,10 +93,18 @@ export function LeadDashboard({ navigate, toast, openModal }) {
       </PageHeader>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="New Leads" value={String(newCount)} icon="✨" iconBg="bg-blue-50" gradient="linear-gradient(90deg,#0B1F3A,#C9A24A)" />
-        <StatCard label="In Screening" value={String(screeningCount)} icon="🔍" iconBg="bg-amber-50" gradient="linear-gradient(90deg,#f59e0b,#fbbf24)" />
-        <StatCard label="Consultations" value={String(consultCount)} icon="🤝" iconBg="bg-emerald-50" gradient="linear-gradient(90deg,#10b981,#34d399)" />
-        <StatCard label="Conversion Rate" value={`${convRate}%`} icon="📈" iconBg="bg-accent-50" gradient="linear-gradient(90deg,#0B1F3A,#C9A24A)" />
+        <StatCard label="New Leads" value={String(newCount)} 
+          icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M12 4v16m8-8H4" /></svg>}
+          iconBg="bg-[#0057c7]/10 text-[#38bdf8]" gradient="linear-gradient(90deg,#0B1F3A,#C9A24A)" />
+        <StatCard label="In Screening" value={String(screeningCount)} 
+          icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>}
+          iconBg="bg-amber-500/10 text-amber-400" gradient="linear-gradient(90deg,#f59e0b,#fbbf24)" />
+        <StatCard label="Consultations" value={String(consultCount)} 
+          icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>}
+          iconBg="bg-emerald-500/10 text-emerald-400" gradient="linear-gradient(90deg,#10b981,#34d399)" />
+        <StatCard label="Conversion Rate" value={`${convRate}%`} 
+          icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>}
+          iconBg="bg-indigo-500/10 text-indigo-400" gradient="linear-gradient(90deg,#0B1F3A,#C9A24A)" />
       </div>
 
       <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-100 no-scrollbar">
@@ -104,8 +112,8 @@ export function LeadDashboard({ navigate, toast, openModal }) {
           const count = key === 'all' ? total : countBy(key);
           return (
             <button key={key} onClick={() => setStageFilter(key)}
-              className={`px-3 py-1.5 rounded-lg text-[12px] font-600 border transition-all whitespace-nowrap ${stageFilter === key ? 'bg-primary-600 text-white border-primary-600 shadow-md shadow-primary-500/20' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}>
-              {label} ({count})
+              className={`px-4 py-2 rounded-xl text-[12px] font-700 border transition-all whitespace-nowrap ${stageFilter === key ? 'bg-[#0057c7] text-white border-transparent shadow-lg shadow-[#0057c7]/20' : 'bg-white/5 text-[#8a94a6] border-white/5 hover:border-white/20 hover:bg-white/10 hover:text-white'}`}>
+              {label} <span className={`ml-1 opacity-50 ${stageFilter === key ? 'text-white' : ''}`}>({count})</span>
             </button>
           );
         })}
@@ -116,20 +124,22 @@ export function LeadDashboard({ navigate, toast, openModal }) {
         {filtered.map((l) => (
           <Tr key={l.id} onClick={() => navigate(`/admin/intake-leads/${l.id}`)}>
             <Td>
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-3">
                 <Avatar initials={leadInitials(l.full_name)} size="sm" />
                 <div>
-                  <p className="font-600 text-slate-900 group-hover:text-primary-600">{l.full_name}</p>
-                  <p className="text-[11px] text-slate-400">#{l.id}</p>
+                  <p className="font-700 text-white group-hover:text-[#38bdf8] transition-colors">{l.full_name}</p>
+                  <p className="text-[11px] text-[#8a94a6] font-500">#{l.id}</p>
                 </div>
               </div>
             </Td>
-            <Td><span className="text-[12px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-lg font-500">{l.matter_type || '—'}</span></Td>
-            <Td className="text-slate-500 text-[12px]">{l.source || '—'}</Td>
-            <Td className="text-slate-500 text-[12px]">{formatLeadDate(l.created_at)}</Td>
+            <Td><span className="text-[11px] bg-[#0057c7]/20 text-[#38bdf8] px-2.5 py-1 rounded-lg font-700 border border-[#0057c7]/30">{l.matter_type || '—'}</span></Td>
+            <Td className="text-[#b8c2d1] text-[13px] font-500">{l.source || '—'}</Td>
+            <Td className="text-[#b8c2d1] text-[13px] font-500">{formatLeadDate(l.created_at)}</Td>
             <Td><Badge status={l.status} /></Td>
             <Td>
-              <button type="button" className="btn btn-secondary btn-xs">View</button>
+              <button type="button" className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-[#8a94a6] hover:bg-[#0057c7] hover:text-white hover:border-transparent transition-all group/btn" title="View Detail">
+                <svg className="w-4 h-4 transition-transform group-hover/btn:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+              </button>
             </Td>
           </Tr>
         ))}
@@ -226,11 +236,11 @@ export function LeadDetailPage({ leadId, navigate, openModal, toast }) {
             <div className="flex items-start gap-4 mb-6">
               <Avatar initials={leadInitials(lead.full_name)} size="xl" />
               <div className="flex-1">
-                <h2 className="text-2xl font-800 text-slate-900 font-display">{lead.full_name}</h2>
-                <div className="flex items-center gap-3 mt-1 text-[13px] text-slate-500 flex-wrap">
-                  <span>🆔 #{lead.id}</span>
-                  <span>📅 Received: {formatLeadDate(lead.created_at)}</span>
-                  <span>📍 {lead.source || '—'}</span>
+                <h2 className="text-2xl font-900 text-white tracking-tight">{lead.full_name}</h2>
+                <div className="flex items-center gap-4 mt-2 text-[13px] text-[#8a94a6] flex-wrap font-500">
+                  <span className="flex items-center gap-1.5"><span className="text-[#0057c7]">🆔</span> #{lead.id}</span>
+                  <span className="flex items-center gap-1.5"><span className="text-[#0057c7]">📅</span> Received: {formatLeadDate(lead.created_at)}</span>
+                  <span className="flex items-center gap-1.5"><span className="text-[#0057c7]">📍</span> {lead.source || '—'}</span>
                 </div>
               </div>
               <Badge status={status} />
@@ -238,7 +248,10 @@ export function LeadDetailPage({ leadId, navigate, openModal, toast }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <h4 className="text-[11px] font-700 text-slate-400 uppercase tracking-wider mb-2">Matter Information</h4>
+                <h4 className="text-[12px] font-800 text-white uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0057c7]"></span>
+                  Matter Information
+                </h4>
                 <div className="space-y-3">
                   <Field label="Matter Type"><Input value={lead.matter_type || ''} readOnly /></Field>
                   <Field label="Practice Area"><Input value={lead.practice_area || ''} readOnly /></Field>
@@ -247,7 +260,10 @@ export function LeadDetailPage({ leadId, navigate, openModal, toast }) {
                 </div>
               </div>
               <div>
-                <h4 className="text-[11px] font-700 text-slate-400 uppercase tracking-wider mb-2">Lead Status</h4>
+                <h4 className="text-[12px] font-800 text-white uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Lead Status
+                </h4>
                 <div className="space-y-3">
                   <Field label="Current Pipeline Stage">
                     <Select value={status} onChange={(e) => setStatus(e.target.value)}>
@@ -266,7 +282,10 @@ export function LeadDetailPage({ leadId, navigate, openModal, toast }) {
           </Card>
 
           <Card>
-            <h4 className="text-[13px] font-700 text-slate-900 mb-3">Intake Notes</h4>
+            <h4 className="text-[14px] font-800 text-white mb-4 flex items-center gap-2">
+              <svg className="w-4 h-4 text-[#0057c7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+              Intake Notes
+            </h4>
             <Textarea rows={6} value={notes} onChange={(e) => setNotes(e.target.value)} />
             <div className="flex justify-end mt-3">
               <button type="button" onClick={saveLead} className="btn btn-primary w-full sm:w-auto justify-center">Save Notes</button>
@@ -276,8 +295,11 @@ export function LeadDetailPage({ leadId, navigate, openModal, toast }) {
 
         <div className="space-y-4">
           <Card>
-            <h4 className="text-[13px] font-700 text-slate-900 mb-3">Message</h4>
-            <p className="text-[12px] text-slate-600 whitespace-pre-wrap">{lead.message || '—'}</p>
+            <h4 className="text-[14px] font-800 text-white mb-4 flex items-center gap-2">
+              <svg className="w-4 h-4 text-[#0057c7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
+              Original Message
+            </h4>
+            <p className="text-[13px] text-[#b8c2d1] leading-relaxed whitespace-pre-wrap bg-white/5 p-4 rounded-2xl border border-white/5">{lead.message || 'No message provided.'}</p>
           </Card>
 
           <Card className="bg-primary-600 text-white">

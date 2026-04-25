@@ -62,61 +62,67 @@ export function VyniusAI({ role = 'admin' }) {
       {!isOpen && (
         <button 
           onClick={() => setIsOpen(true)}
-          className="flex items-center justify-center w-12 h-12 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 bg-gradient-to-r from-primary-600 to-accent-500 text-white animate-fade-in"
+          className="flex items-center justify-center w-14 h-14 rounded-full shadow-[0_8px_30px_rgba(0,87,199,0.4)] transition-all duration-300 transform hover:scale-110 active:scale-95 bg-[#0057c7] text-white animate-fade-in group border-2 border-white/20"
         >
-          <span className="text-xl">🤖</span>
+          <svg className="w-7 h-7 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
         </button>
       )}
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed sm:absolute bottom-4 left-4 right-4 sm:left-auto sm:right-0 sm:bottom-0 w-auto sm:w-[360px] max-w-none sm:max-w-[90vw] h-[75vh] sm:h-[500px] bg-white rounded-[1.5rem] sm:rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 flex flex-col overflow-hidden animate-slide-up origin-bottom-right">
+        <div className="fixed sm:absolute bottom-4 left-4 right-4 sm:left-auto sm:right-0 sm:bottom-0 w-auto sm:w-[380px] max-w-none sm:max-w-[90vw] h-[75vh] sm:h-[550px] bg-[#1a2233] rounded-[2rem] shadow-[0_30px_100px_rgba(0,0,0,0.6)] border border-white/10 flex flex-col overflow-hidden animate-slide-up origin-bottom-right">
           {/* Header */}
-          <div className="p-5 bg-slate-900 text-white flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-400 to-accent-500 flex items-center justify-center text-xl shadow-lg shadow-primary-500/20">🤖</div>
+          <div className="p-6 bg-[#00163c] text-white flex items-center justify-between border-b border-white/5">
+            <div className="flex items-center gap-4">
+              <div className="w-11 h-11 rounded-2xl bg-[#0057c7] flex items-center justify-center text-white shadow-[0_4px_12px_rgba(0,87,199,0.3)]">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+              </div>
               <div>
-                <h3 className="text-[14px] font-800 text-white">Vynius Intelligence</h3>
+                <h3 className="text-[15px] font-800 text-white tracking-tight">VyNius Intel</h3>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                  <span className="text-[10px] font-700 text-primary-100 uppercase tracking-widest">AI Online</span>
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+                  <span className="text-[10px] font-800 text-[#38bdf8] uppercase tracking-widest">Neural Link Active</span>
                 </div>
               </div>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white transition-colors">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M18 6L6 18M6 6l12 12" /></svg>
+            <button onClick={() => setIsOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/5 text-[#8a94a6] hover:text-white hover:bg-white/10 transition-all">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M18 6L6 18M6 6l12 12" /></svg>
             </button>
           </div>
 
           {/* Messages area */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50/50">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-5 bg-[#111520] custom-scrollbar">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-3.5 rounded-2xl text-[13px] leading-relaxed shadow-sm ${
+                <div className={`max-w-[85%] p-4 rounded-[1.25rem] text-[13.5px] leading-relaxed shadow-lg ${
                   m.role === 'user' 
-                  ? 'bg-primary-600 text-white rounded-br-none' 
-                  : 'bg-white text-slate-700 border border-slate-100 rounded-bl-none'
+                  ? 'bg-[#0057c7] text-white rounded-br-none shadow-[#0057c7]/20' 
+                  : 'bg-[#1a2233] text-[#dbe7ff] border border-white/5 rounded-bl-none shadow-black/20'
                 }`}>
                   {m.text.split('\n').map((line, idx) => <p key={idx}>{line}</p>)}
                 </div>
               </div>
             ))}
             {isTyping && (
-              <div className="flex justify-start animate-fade-in text-slate-400">
-                <div className="bg-white border border-slate-100 p-3.5 rounded-2xl rounded-bl-none shadow-sm flex gap-1 items-center">
-                  <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                  <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                  <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" />
+              <div className="flex justify-start animate-fade-in">
+                <div className="bg-[#1a2233] border border-white/5 p-4 rounded-[1.25rem] rounded-bl-none shadow-lg flex gap-1.5 items-center">
+                  <span className="w-1.5 h-1.5 bg-[#0057c7] rounded-full animate-bounce [animation-delay:-0.3s]" />
+                  <span className="w-1.5 h-1.5 bg-[#0057c7] rounded-full animate-bounce [animation-delay:-0.15s]" />
+                  <span className="w-1.5 h-1.5 bg-[#0057c7] rounded-full animate-bounce" />
                 </div>
               </div>
             )}
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-white border-t border-slate-100">
-            <div className="flex gap-2 mb-3 overflow-x-auto pb-1 no-scrollbar">
+          <div className="p-5 bg-[#1a2233] border-t border-white/5">
+            <div className="flex gap-2 mb-4 overflow-x-auto pb-1 no-scrollbar">
               {['Summary', 'Next Steps', 'Billing'].map(chip => (
-                <button key={chip} onClick={() => { setInput(chip); }} className="whitespace-nowrap px-3 py-1.5 bg-slate-100 hover:bg-primary-50 hover:text-primary-600 text-slate-500 rounded-full text-[11px] font-700 transition-all border border-transparent hover:border-primary-100">
+                <button key={chip} onClick={() => { setInput(chip); }} className="whitespace-nowrap px-4 py-2 bg-white/5 hover:bg-[#0057c7]/10 hover:text-[#38bdf8] text-[#8a94a6] rounded-full text-[11px] font-800 transition-all border border-white/5 hover:border-[#0057c7]/20 uppercase tracking-wider">
                   {chip}
                 </button>
               ))}
@@ -128,14 +134,14 @@ export function VyniusAI({ role = 'admin' }) {
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSend()}
                 placeholder="Ask Vynius anything..."
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-4 pr-12 py-3.5 text-[13px] focus:ring-2 focus:ring-primary-100 outline-none transition-all placeholder:text-slate-400"
+                className="w-full bg-[#111520] border border-white/10 rounded-2xl pl-5 pr-14 py-4 text-[14px] text-white focus:border-[#0057c7] focus:ring-4 focus:ring-[#0057c7]/10 outline-none transition-all placeholder:text-[#8a94a6] font-medium"
               />
               <button 
                 onClick={handleSend}
                 disabled={!input.trim()}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-primary-600 text-white rounded-xl flex items-center justify-center hover:bg-primary-700 disabled:opacity-30 disabled:hover:bg-primary-600 shadow-lg shadow-primary-500/20 transition-all"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#0057c7] text-white rounded-xl flex items-center justify-center hover:bg-[#0066eb] disabled:opacity-30 disabled:hover:bg-[#0057c7] shadow-lg shadow-[#0057c7]/20 transition-all"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M5 12h14M12 5l7 7-7 7" /></svg>
               </button>
             </div>
           </div>

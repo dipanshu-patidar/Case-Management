@@ -3,18 +3,17 @@ import { Avatar } from './UI.jsx';
 import api from '../services/api';
 
 const ROLE_INFO = {
-  admin: { name: 'Admin User', role: 'Administrator', initials: 'AU', color: 'linear-gradient(135deg,#0B1F3A,#C9A24A)' },
-  lawyer: { name: 'Alex Parker', role: 'Lawyer', initials: 'AP', color: 'linear-gradient(135deg,#0B1F3A,#C9A24A)' },
-  client: { name: 'Sarah Mitchell', role: 'Client Portal', initials: 'SM', color: 'linear-gradient(135deg,#10b981,#059669)' },
+  admin: { name: 'Admin User', role: 'Administrator', initials: 'AU', color: '#003e9e' },
+  lawyer: { name: 'Alex Parker', role: 'Lawyer', initials: 'AP', color: '#003e9e' },
+  client: { name: 'Sarah Mitchell', role: 'Client Portal', initials: 'SM', color: '#22c55e' },
 };
 
 const NOTIF_CONFIG = {
-  document: { icon: '📄', color: 'bg-blue-50 text-blue-600' },
-  deadline: { icon: '📅', color: 'bg-amber-50 text-amber-600' },
-  client:   { icon: '👤', color: 'bg-emerald-50 text-emerald-600' },
-  system:   { icon: '🔔', color: 'bg-indigo-50 text-indigo-600' },
+  document: { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /><path d="M13 3v5a1 1 0 001 1h5" /></svg>, color: 'bg-blue-500/10 text-blue-400' },
+  deadline: { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>, color: 'bg-amber-500/10 text-amber-400' },
+  client:   { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>, color: 'bg-emerald-500/10 text-emerald-400' },
+  system:   { icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>, color: 'bg-indigo-500/10 text-indigo-400' },
 };
-
 
 export default function Topbar({ sidebarOpen, onToggleSidebar, role, onLogout, toast, navigate, user }) {
   const [showNotifs, setShowNotifs] = useState(false);
@@ -96,37 +95,19 @@ export default function Topbar({ sidebarOpen, onToggleSidebar, role, onLogout, t
         fetchNotifications();
       }
       
-      // Navigate based on notification type
       const baseRole = role?.toLowerCase() || 'admin';
       const refId = notif.reference_id;
       
       if (refId) {
         switch (notif.type) {
-          case 'document':
-            navigate(`/${baseRole}/matters/${refId}?tab=Documents`);
-            break;
-          case 'deadline':
-            navigate(`/${baseRole}/matters/${refId}?tab=Tasks`);
-            break;
-          case 'system':
-            // Usually message notifications
-            navigate(`/${baseRole}/matters/${refId}?tab=Messages`);
-            break;
-          case 'client':
-            // Lead notification
-            if (baseRole === 'admin') {
-              navigate(`/admin/intake-leads/${refId}`);
-            }
-            break;
-          case 'invoice':
-            navigate(`/${baseRole}/matters/${refId}?tab=Billing`);
-            break;
-          default:
-            // Fallback for system or unknown types if reference_id is a matter
-            navigate(`/${baseRole}/matters/${refId}`);
+          case 'document': navigate(`/${baseRole}/matters/${refId}?tab=Documents`); break;
+          case 'deadline': navigate(`/${baseRole}/matters/${refId}?tab=Tasks`); break;
+          case 'system': navigate(`/${baseRole}/matters/${refId}?tab=Messages`); break;
+          case 'client': if (baseRole === 'admin') navigate(`/admin/intake-leads/${refId}`); break;
+          case 'invoice': navigate(`/${baseRole}/matters/${refId}?tab=Billing`); break;
+          default: navigate(`/${baseRole}/matters/${refId}`);
         }
       }
-      
       setShowNotifs(false);
     } catch (e) {
       toast('Failed to handle notification', 'error');
@@ -178,122 +159,130 @@ export default function Topbar({ sidebarOpen, onToggleSidebar, role, onLogout, t
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200/60 flex items-center px-4 gap-4 flex-shrink-0 relative z-50">
+    <header className="h-[72px] bg-[#0057c7] border-b border-white/10 flex items-center px-6 gap-6 flex-shrink-0 relative z-[60] shadow-lg sticky top-0">
       <button onClick={onToggleSidebar}
-        className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 transition-all active:scale-95">
-        <svg className="w-5.5 h-5.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
+        className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all">
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M4 6h16M4 12h16M4 18h16" /></svg>
       </button>
 
-      {/* Global Search - adaptive for mobile */}
-      <div className="flex items-center gap-2 sm:gap-2.5 bg-slate-50 border border-slate-200 rounded-xl px-2 sm:px-3.5 py-1.5 sm:py-2 flex-1 max-w-[160px] sm:max-w-sm transition-all focus-within:bg-white focus-within:ring-4 focus-within:ring-primary-50 focus-within:border-primary-200 relative">
-        <svg className="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
+      {/* Global Search */}
+      <div className="flex items-center gap-3 bg-white/10 border border-white/10 rounded-2xl px-4 py-2.5 flex-1 max-w-lg transition-all focus-within:bg-[#111520] focus-within:border-[#0057c7] focus-within:shadow-2xl focus-within:ring-4 focus-within:ring-blue-900/10 relative group">
+        <svg className="w-5 h-5 text-white/60 group-focus-within:text-[#38bdf8] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
         <input 
-          className="bg-transparent border-none outline-none text-[12px] sm:text-[13.5px] text-slate-700 w-full placeholder:text-slate-400 font-500" 
-          placeholder="Search..." 
+          className="bg-transparent border-none outline-none text-[14px] text-white w-full placeholder:text-white/60 font-medium" 
+          placeholder="Search matters, clients, invoices..." 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => setShowResults(true)}
         />
         
         {showResults && (searchQuery.trim().length >= 2 || isSearching) && (
-          <div ref={searchRef} className="absolute top-12 left-0 w-[calc(100vw-2rem)] sm:w-full bg-white rounded-2xl shadow-2xl border border-slate-200 animate-fade-in overflow-hidden z-[100] max-h-[400px] overflow-y-auto">
+          <div ref={searchRef} className="absolute top-[60px] left-0 w-full bg-[#1a2233] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] border border-white/10 animate-fade-in overflow-hidden z-[100] max-h-[450px] overflow-y-auto">
             {isSearching ? (
-              <div className="p-6 flex flex-col items-center justify-center gap-2">
-                <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
-                <p className="text-[10px] text-slate-400 font-600 uppercase tracking-widest">Searching...</p>
+              <div className="p-8 flex flex-col items-center justify-center gap-3">
+                <div className="w-6 h-6 border-2 border-[#38bdf8] border-t-transparent rounded-full animate-spin" />
+                <p className="text-[11px] text-[#8a94a6] font-700 uppercase tracking-[0.2em]">Searching Registry...</p>
               </div>
             ) : searchResults.length > 0 ? (
-              <div className="py-2">
-                <div className="px-4 py-1.5 bg-slate-50 border-y border-slate-100 mb-1">
-                  <p className="text-[10px] font-800 text-slate-400 uppercase tracking-widest">Top Results</p>
+              <div className="py-3">
+                <div className="px-6 py-2 bg-white/5 border-y border-white/5 mb-2">
+                  <p className="text-[10px] font-800 text-[#8a94a6] uppercase tracking-[0.2em]">Global Search Results</p>
                 </div>
                 {searchResults.map((res, i) => (
                   <div 
                     key={`${res.type}-${res.id}-${i}`}
-                    onClick={() => {
-                      navigate(res.url);
-                      setShowResults(false);
-                      setSearchQuery('');
-                    }}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-primary-50/50 cursor-pointer transition-colors group"
+                    onClick={() => { navigate(res.url); setShowResults(false); setSearchQuery(''); }}
+                    className="flex items-center gap-4 px-6 py-3.5 hover:bg-white/5 cursor-pointer transition-colors group"
                   >
-                    <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-sm group-hover:bg-primary-100 group-hover:text-primary-600 transition-colors">
-                      {res.type === 'Matter' ? '📁' : res.type === 'Client' ? '👤' : res.type === 'Document' ? '📄' : '📥'}
+                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-[#8a94a6] group-hover:bg-[#0057c7] group-hover:text-white transition-all">
+                      {res.type === 'Matter' ? (
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                      ) : res.type === 'Client' ? (
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
+                      ) : res.type === 'Document' ? (
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /><path d="M13 3v5a1 1 0 001 1h5" /></svg>
+                      ) : (
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-[13px] font-600 text-slate-900 group-hover:text-primary-700 transition-colors truncate">{res.title}</p>
-                        <span className="text-[9px] font-800 uppercase tracking-widest px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 group-hover:bg-primary-100 group-hover:text-primary-600">{res.type}</span>
+                        <p className="text-[14px] font-600 text-white group-hover:text-[#38bdf8] transition-colors truncate">{res.title}</p>
+                        <span className="text-[9px] font-800 uppercase tracking-widest px-2 py-0.5 rounded bg-white/10 text-[#8a94a6] group-hover:bg-[#38bdf8]/20 group-hover:text-[#38bdf8]">{res.type}</span>
                       </div>
-                      <p className="text-[11px] text-slate-400 truncate">{res.subtitle}</p>
+                      <p className="text-[12px] text-[#8a94a6] truncate">{res.subtitle}</p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="p-12 text-center">
-                <p className="text-2xl mb-2">🔍</p>
-                <p className="text-[13px] text-slate-500 font-500">No results found for "{searchQuery}"</p>
+              <div className="p-16 text-center">
+                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4 text-[#8a94a6]">
+                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </div>
+                <p className="text-[14px] text-[#8a94a6] font-500">No results found for "{searchQuery}"</p>
               </div>
             )}
           </div>
         )}
       </div>
 
-      <div className="flex items-center gap-1.5 sm:gap-3 ml-auto">
-        {/* Timer - only for lawyers */}
-
+      <div className="flex items-center gap-4 ml-auto">
         {/* Notifications */}
         <div className="relative">
           <button onClick={() => { setShowNotifs(!showNotifs); setShowProfile(false); }}
-            className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl transition-all active:scale-95 relative ${showNotifs ? 'bg-primary-50 text-primary-600' : 'text-slate-500 hover:bg-slate-100'}`}>
+            className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all active:scale-95 relative ${showNotifs ? 'bg-white text-[#0057c7]' : 'bg-white/10 text-white hover:bg-white/20'}`}>
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
             {unreadCount > 0 && (
-              <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-primary-600 text-white text-[7px] sm:text-[8px] font-800 rounded-full flex items-center justify-center border-2 border-white shadow-sm">{unreadCount}</span>
+              <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 bg-[#ef4444] text-white text-[10px] font-900 rounded-full flex items-center justify-center border-2 border-[#0057c7] shadow-lg animate-pulse z-10">
+                {unreadCount}
+              </span>
             )}
           </button>
 
           {showNotifs && (
-            <div className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 animate-fade-in overflow-hidden z-50">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+            <div className="absolute right-0 top-14 w-80 bg-[#1a2233] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 animate-fade-in overflow-hidden z-[70]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-white/5 bg-white/5">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-[14px] font-700 text-slate-900">Notifications</h4>
-                  {unreadCount > 0 && <span className="text-[11px] bg-primary-50 text-primary-600 font-700 px-2 py-0.5 rounded-lg">{unreadCount}</span>}
+                  <h4 className="text-[15px] font-700 text-white">Notifications</h4>
+                  {unreadCount > 0 && <span className="text-[11px] bg-[#0057c7] text-white font-700 px-2.5 py-0.5 rounded-full">{unreadCount}</span>}
                 </div>
                 {notifs.length > 0 && (
-                  <button onClick={handleClearAll} className="text-[11px] text-slate-400 hover:text-red-500 font-700 transition-colors uppercase tracking-wider">Clear All</button>
+                  <button onClick={handleClearAll} className="text-[10px] text-[#8a94a6] hover:text-[#ef4444] font-800 transition-colors uppercase tracking-widest">Clear All</button>
                 )}
               </div>
-              <div className="max-h-[320px] overflow-y-auto">
+              <div className="max-h-[350px] overflow-y-auto custom-scrollbar">
                 {notifs.length > 0 ? notifs.map(n => {
                   const cfg = NOTIF_CONFIG[n.type] || NOTIF_CONFIG.system;
                   return (
                     <div key={n.id} onClick={() => handleMarkAsRead(n)}
-                      className={`flex items-start gap-3.5 px-4 py-3.5 hover:bg-slate-50 cursor-pointer transition-colors group relative ${!n.is_read ? 'bg-primary-50/20' : ''}`}>
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-base flex-shrink-0 ${cfg.color}`}>{cfg.icon}</div>
+                      className={`flex items-start gap-4 px-5 py-4 hover:bg-white/5 cursor-pointer transition-colors group relative ${!n.is_read ? 'bg-white/5' : ''}`}>
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.color}`}>{cfg.icon}</div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] text-slate-700 leading-snug font-500">{n.title}</p>
-                        <p className="text-[12px] text-slate-500 mt-0.5 truncate">{n.message}</p>
-                        <p className="text-[11px] text-slate-400 mt-1">{formatNotifTime(n.created_at)}</p>
+                        <p className="text-[13.5px] text-white leading-snug font-600">{n.title}</p>
+                        <p className="text-[12px] text-[#8a94a6] mt-1 line-clamp-2">{n.message}</p>
+                        <p className="text-[11px] text-[#38bdf8] mt-1.5 font-700 uppercase tracking-tighter">{formatNotifTime(n.created_at)}</p>
                       </div>
-                      <div className="flex flex-col items-center gap-2 flex-shrink-0">
-                        {!n.is_read && <div className="w-2 h-2 bg-primary-500 rounded-full shadow-sm shadow-primary-500/50" />}
+                      <div className="flex flex-col items-center gap-3 flex-shrink-0">
+                        {!n.is_read && <div className="w-2 h-2 bg-[#38bdf8] rounded-full shadow-[0_0_10px_rgba(56,189,248,0.5)]" />}
                         <button onClick={(e) => handleDelete(e, n.id)} 
-                          className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100">
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M6 18L18 6M6 6l12 12"/></svg>
+                          className="w-7 h-7 flex items-center justify-center rounded-lg text-white/20 hover:bg-white/10 hover:text-[#ef4444] transition-all opacity-0 group-hover:opacity-100">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                       </div>
                     </div>
                   );
                 }) : (
-                  <div className="py-12 flex flex-col items-center justify-center text-slate-400 gap-2">
-                    <span className="text-2xl">🔔</span>
-                    <p className="text-[12px]">All caught up!</p>
+                  <div className="py-16 flex flex-col items-center justify-center text-[#8a94a6] gap-3">
+                    <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-[#f59e0b] shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+                      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    </div>
+                    <p className="text-[13px] font-600">All caught up!</p>
                   </div>
                 )}
               </div>
-              <div className="p-3 border-t border-slate-100 bg-slate-50">
-                <button onClick={handleMarkAllRead} className="text-[12px] text-primary-600 font-700 hover:bg-white w-full py-2 rounded-lg transition-all border border-transparent hover:border-slate-200">Mark all as read</button>
+              <div className="p-4 border-t border-white/5 bg-black/20">
+                <button onClick={handleMarkAllRead} className="text-[12px] text-[#38bdf8] font-700 hover:bg-white/10 w-full py-2.5 rounded-xl transition-all border border-white/10">Mark all as read</button>
               </div>
             </div>
           )}
@@ -302,33 +291,29 @@ export default function Topbar({ sidebarOpen, onToggleSidebar, role, onLogout, t
         {/* Profile */}
         <div className="relative">
           <button onClick={() => { setShowProfile(!showProfile); setShowNotifs(false); }}
-            className={`flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl transition-all active:scale-95 ${showProfile ? 'bg-primary-50 ring-2 ring-primary-100' : 'hover:bg-slate-100'}`}>
-            <Avatar initials={displayInitials} size="sm" color={info.color} />
-            <div className="hidden sm:block text-left">
-              <p className="text-[12px] sm:text-[13px] font-700 text-slate-900 leading-tight">{displayName}</p>
-              <p className="text-[10px] sm:text-[11px] text-slate-400 font-500">{info.role}</p>
-            </div>
-            <svg className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 transition-transform ${showProfile ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><polyline points="6 9 12 15 18 9" /></svg>
+            className={`flex items-center gap-3 px-1 py-1 rounded-full transition-all active:scale-95 ${showProfile ? 'bg-white/20' : 'hover:bg-white/10'}`}>
+            <Avatar initials={displayInitials} size="sm" color={info.color} className="ring-2 ring-white/20" />
+            <svg className={`w-4 h-4 text-white/60 transition-transform hidden sm:block ${showProfile ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><polyline points="6 9 12 15 18 9" /></svg>
           </button>
 
           {showProfile && (
-            <div className="absolute right-0 top-12 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 animate-fade-in overflow-hidden z-50">
-              <div className="px-4 py-4 border-b border-slate-100 bg-slate-50/50">
-                <p className="text-[14px] font-700 text-slate-900">{displayName}</p>
-                <p className="text-[11px] text-slate-400 font-500">{info.role}</p>
+            <div className="absolute right-0 top-14 w-60 bg-[#1a2233] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 animate-fade-in overflow-hidden z-[70]">
+              <div className="px-5 py-5 border-b border-white/5 bg-white/5">
+                <p className="text-[15px] font-700 text-white">{displayName}</p>
+                <p className="text-[11px] text-[#8a94a6] font-600 uppercase tracking-widest mt-1">{info.role}</p>
               </div>
-              <div className="p-1.5">
-                {[
-                  { label: '⚙️ Settings', id: 'settings' }
-                ].map((item) => (
-                  <button key={item.id} onClick={() => { setShowProfile(false); navigate(`/${role}/${item.id}`); }}
-                    className="w-full px-3 py-2.5 text-left text-[13.5px] font-600 text-slate-600 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-all flex items-center gap-2">{item.label}</button>
-                ))}
+              <div className="p-2">
+                <button onClick={() => { setShowProfile(false); navigate(role === 'admin' ? '/admin/settings' : `/${role}/profile`); }}
+                  className="w-full px-4 py-3 text-left text-[13.5px] font-600 text-[#dbe7ff] hover:bg-white/10 hover:text-white rounded-xl transition-all flex items-center gap-3">
+                  <svg className="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><circle cx="12" cy="12" r="3" /></svg>
+                  Account Settings
+                </button>
               </div>
-              <div className="p-1.5 border-t border-slate-100">
+              <div className="p-2 border-t border-white/5">
                 <button onClick={() => { setShowProfile(false); onLogout(); }}
-                  className="w-full px-3 py-2.5 text-left text-[13.5px] font-700 text-red-500 hover:bg-red-50 rounded-xl transition-all flex items-center gap-2">
-                  🚪 Sign Out
+                  className="w-full px-4 py-3 text-left text-[13.5px] font-800 text-[#ef4444] hover:bg-[#ef4444]/10 rounded-xl transition-all flex items-center gap-3">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                  Sign Out Platform
                 </button>
               </div>
             </div>
@@ -337,7 +322,7 @@ export default function Topbar({ sidebarOpen, onToggleSidebar, role, onLogout, t
       </div>
 
       {(showNotifs || showProfile) && (
-        <div className="fixed inset-0 z-40" onClick={() => { setShowNotifs(false); setShowProfile(false); }} />
+        <div className="fixed inset-0 z-[65]" onClick={() => { setShowNotifs(false); setShowProfile(false); }} />
       )}
     </header>
   );

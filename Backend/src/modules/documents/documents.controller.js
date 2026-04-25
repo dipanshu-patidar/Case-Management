@@ -1,6 +1,7 @@
 const service = require('./documents.service');
 const { sendResponse } = require('../../utils/response');
 const fs = require('fs');
+const path = require('path');
 
 const getAll = async (req, res, next) => {
   try {
@@ -63,13 +64,29 @@ const download = async (req, res, next) => {
     if (!doc) {
       return res.status(404).json(sendResponse(false, 'Document not found'));
     }
-    if (!doc.file_path || !fs.existsSync(doc.file_path)) {
+
+    let filePath = doc.file_path;
+
+    // Robust path resolution: if stored path doesn't exist (e.g. project moved),
+    // try to find it in the current uploads/documents directory using the filename.
+    if (!filePath || !fs.existsSync(filePath)) {
+      const fileName = doc.file_name || (filePath ? path.basename(filePath) : null);
+      if (fileName) {
+        const fallbackPath = path.join(process.cwd(), 'uploads', 'documents', fileName);
+        if (fs.existsSync(fallbackPath)) {
+          filePath = fallbackPath;
+        }
+      }
+    }
+
+    if (!filePath || !fs.existsSync(filePath)) {
       return res.status(404).json(sendResponse(false, 'Document file not found on server'));
     }
+
     res.setHeader('Content-Type', doc.mime_type || 'application/octet-stream');
     res.setHeader('Content-Disposition', `attachment; filename="${doc.original_name}"`);
     res.setHeader('X-Filename', doc.original_name || `document-${doc.id}`);
-    return res.sendFile(doc.file_path);
+    return res.sendFile(filePath);
   } catch (err) {
     next(err);
   }
