@@ -108,93 +108,104 @@ function LoginScreen({ onLogin }) {
       </div>
 
       {/* Right Panel - Institutional Login Form */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 sm:p-12 lg:p-24 bg-[#f8fafc] relative">
-        <div className="w-full max-w-md space-y-10 animate-fade-in">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 sm:p-12 lg:p-24 bg-[#0a0f1a] relative overflow-hidden">
+        {/* Background Atmosphere */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#0057c7]/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#C9A24A]/5 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="w-full max-w-xl space-y-12 animate-fade-in relative z-10">
           {/* Mobile Logo */}
-          <div className="md:hidden flex flex-col items-center gap-4 mb-8">
-            <img src={logoImg} alt="Logo" className="h-16 w-auto" />
-            <h1 className="text-[#1a1f2e] font-serif text-2xl">Victoria Tulsidas Law</h1>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 mb-4 text-[11px] font-900 text-slate-400 uppercase tracking-widest">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-              Secure Login | Case Management System
+          <div className="md:hidden flex flex-col items-center gap-4 mb-12">
+            <div className="w-16 h-16 p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl">
+              <img src={logoImg} alt="Logo" className="w-full h-full object-contain" />
             </div>
-            <h2 className="text-[#1a1f2e] font-serif text-5xl tracking-tight">Welcome Back</h2>
-            <p className="text-slate-500 text-lg">Sign in to access your dashboard</p>
+            <h1 className="text-white font-serif text-3xl tracking-tight">Victoria Tulsidas Law</h1>
           </div>
 
-          <div className="bg-white rounded-[2.5rem] p-8 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-slate-100">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="px-4 py-1.5 rounded-full bg-[#0057c7] text-white text-[11px] font-900 uppercase tracking-[0.2em] shadow-lg shadow-[#0057c7]/30">
+                Secure Gateway
+              </div>
+              <div className="h-px w-12 bg-white/10" />
+              <span className="text-[12px] font-800 text-slate-500 uppercase tracking-widest">Case Management System</span>
+            </div>
+            <h2 className="text-white font-serif text-6xl tracking-tight leading-tight">Welcome <span className="text-[#C9A24A]">Back</span></h2>
+            <p className="text-slate-400 text-lg font-medium">Authorized personnel only. Please sign in to access the registry.</p>
+          </div>
+
+          <div className="bg-white/[0.02] backdrop-blur-3xl rounded-[3rem] p-10 sm:p-14 shadow-2xl border border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 group-hover:bg-[#C9A24A]/10 transition-colors" />
+            
             {/* Role Selector */}
-            <div className="bg-slate-50 border border-slate-100 rounded-2xl p-1.5 flex mb-8">
+            <div className="bg-white/5 border border-white/10 rounded-[1.5rem] p-1.5 flex mb-12 relative z-10">
               {Object.entries(roleMap).map(([key, info]) => (
                 <button key={key} onClick={() => handleRoleSelect(key)}
-                  className={`flex-1 py-3 px-4 rounded-xl text-[11px] font-900 uppercase tracking-widest transition-all duration-300 ${role === key
-                    ? `${info.color} text-white shadow-lg`
-                    : 'text-slate-400 hover:text-slate-600'}`}>
+                  className={`flex-1 py-4 px-4 rounded-xl text-[11px] font-900 uppercase tracking-widest transition-all duration-300 ${role === key
+                    ? `bg-[#0057c7] text-white shadow-xl shadow-[#0057c7]/20`
+                    : 'text-slate-500 hover:text-white hover:bg-white/5'}`}>
                   {info.label}
                 </button>
               ))}
             </div>
 
             {errorMsg && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-[13px] font-700 text-center animate-shake">
+              <div className="mb-8 p-5 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-[14px] font-700 text-center animate-shake relative z-10">
                 {errorMsg}
               </div>
             )}
 
-            <div className="space-y-6 mb-8">
-              <div className="space-y-2">
-                <label className="block text-[12px] font-700 text-slate-700 ml-1">Email Address</label>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#1a1f2e] transition-colors">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            <div className="space-y-8 mb-12 relative z-10">
+              <div className="space-y-3">
+                <label className="block text-[11px] font-900 text-slate-400 uppercase tracking-[0.2em] ml-2">Email Identity</label>
+                <div className="relative group/input">
+                  <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-[#38bdf8] transition-colors">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                   </div>
                   <input value={email} onChange={e => setEmail(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-4 py-4 text-[#1a1f2e] text-[15px] outline-none focus:border-[#1a1f2e] focus:ring-4 focus:ring-slate-900/5 transition-all font-medium"
-                    placeholder="Enter your email" />
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-14 pr-5 py-5 text-white text-[16px] outline-none focus:border-[#38bdf8] focus:ring-4 focus:ring-[#38bdf8]/10 transition-all font-medium placeholder:text-slate-600 shadow-inner"
+                    placeholder="Enter your credential email" />
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <label className="block text-[12px] font-700 text-slate-700 ml-1">Password</label>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#1a1f2e] transition-colors">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+              <div className="space-y-3">
+                <label className="block text-[11px] font-900 text-slate-400 uppercase tracking-[0.2em] ml-2">Secure Credential</label>
+                <div className="relative group/input">
+                  <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-[#38bdf8] transition-colors">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                   </div>
                   <input type="password" value={pass} onChange={e => setPass(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-12 py-4 text-[#1a1f2e] text-[15px] outline-none focus:border-[#1a1f2e] focus:ring-4 focus:ring-slate-900/5 transition-all font-medium"
-                    placeholder="Enter your password" />
-                  <button className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-600">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-14 pr-14 py-5 text-white text-[16px] outline-none focus:border-[#38bdf8] focus:ring-4 focus:ring-[#38bdf8]/10 transition-all font-medium placeholder:text-slate-600 shadow-inner"
+                    placeholder="••••••••" />
+                  <button className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 text-[13px] text-slate-500 font-600 cursor-pointer group">
-                  <input type="checkbox" defaultChecked className="w-4 h-4 rounded border-slate-300 text-[#001640] focus:ring-[#001640]" />
-                  Remember me
+              <div className="flex items-center justify-between px-2">
+                <label className="flex items-center gap-3 text-[13px] text-slate-400 font-600 cursor-pointer group">
+                  <input type="checkbox" defaultChecked className="w-4.5 h-4.5 rounded-[6px] border-white/10 bg-white/5 text-[#0057c7] focus:ring-[#0057c7]/50" />
+                  Remember this device
                 </label>
-                <button className="text-[13px] text-[#001640] font-800 hover:underline">Forgot Password?</button>
+                <button className="text-[13px] text-[#38bdf8] font-800 hover:text-white transition-colors">Forgot Password?</button>
               </div>
             </div>
 
             <button onClick={handleSubmit} disabled={isLoading}
-              className="w-full py-4 bg-[#001640] text-white font-900 uppercase tracking-[0.2em] rounded-2xl text-[14px] hover:bg-[#001640]/90 hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 disabled:opacity-50">
-              {isLoading ? 'Signing In...' : 'Sign In'}
+              className="w-full py-5 bg-[#0057c7] text-white font-900 uppercase tracking-[0.3em] rounded-2xl text-[15px] hover:bg-[#004bb1] hover:shadow-2xl hover:shadow-[#0057c7]/30 hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] transition-all duration-300 disabled:opacity-50 relative z-10 shadow-lg">
+              {isLoading ? 'Synchronizing...' : 'Enter Platform'}
             </button>
           </div>
 
-          <p className="text-center text-[13px] text-slate-500 font-500">
-            Don't have an account? <span className="text-[#001640] font-800 cursor-pointer hover:underline">Contact Administrator</span>
+          <p className="text-center text-[14px] text-slate-500 font-600">
+            Internal Access Only. <span className="text-[#C9A24A] font-800 cursor-pointer hover:text-white transition-colors ml-1">Contact Systems Admin</span>
           </p>
         </div>
 
         <div className="absolute bottom-10 left-0 w-full text-center opacity-40">
-          <p className="text-[11px] font-900 text-slate-500 uppercase tracking-[0.2em]">
-            © 2024 Victoria Tulsidas, JD. All rights reserved.
+          <p className="text-[10px] font-900 text-slate-600 uppercase tracking-[0.4em]">
+            © 2024 Victoria Tulsidas, JD. Secure Legal Network v2.4.0
           </p>
         </div>
       </div>

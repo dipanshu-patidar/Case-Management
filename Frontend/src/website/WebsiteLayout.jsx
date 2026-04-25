@@ -29,11 +29,11 @@ function PublicNavbar() {
   }, [location]);
 
   const navLinks = [
-    { label: 'Home', path: '/#home' },
-    { label: 'Our Firm', path: '/#our-firm' },
-    { label: 'Practice Areas', path: '/#practice-areas' },
-    { label: 'Contact Us', path: '/#contact-us' },
-    { label: 'Book a Consultation', path: '/#book-consultation' },
+    { label: 'HOME', path: '/#home' },
+    { label: 'OUR FIRM', path: '/#our-firm' },
+    { label: 'PRAC AREAS', path: '/#practice-areas' },
+    { label: 'CONTACT', path: '/#contact-us' },
+    { label: 'CONSULTATION', path: '/#book-consultation' },
   ];
 
   return (
@@ -125,9 +125,10 @@ function PublicFooter() {
                 <span className="text-slate-500 text-[11px] font-600 block mt-1">A Professional Legal Corporation</span>
               </div>
             </Link>
-            <p className="text-slate-500 text-[15px] leading-relaxed font-500">
-              Exceptional legal advocacy with a modern touch. Committed to precision, integrity, and client success across the Southern California region.
-            </p>
+            <div className="text-slate-500 text-[15px] leading-relaxed font-500 space-y-4">
+              <p>We deliver focused legal advocacy defined by precision, integrity, and disciplined strategy.</p>
+              <p>Based in West Hollywood, serving clients throughout Southern California.</p>
+            </div>
             <div className="pt-4">
               <p className="text-primary-600 font-900 text-[13px] uppercase tracking-[0.25em] underline decoration-primary-200 underline-offset-[12px] decoration-2 transition-all hover:decoration-primary-600">www.VictoriaTulsidasLaw.com</p>
             </div>
@@ -156,18 +157,22 @@ function PublicFooter() {
             <h4 className="text-slate-900 font-900 text-[11px] uppercase tracking-[0.3em] mb-10 leading-none">Contact Our Office</h4>
             <div className="space-y-6">
               <div className="flex gap-4 items-start">
-                <span className="text-slate-400 bg-slate-100 p-2 rounded-lg text-xs grayscale">📍</span>
+                <svg className="w-5 h-5 text-slate-400 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                 <p className="text-slate-600 text-[13px] leading-relaxed font-600">
                   750 San Vicente Blvd, Suite 800, Southern California, CA 90069
                 </p>
               </div>
               <div className="flex gap-4 items-center">
-                <span className="text-slate-400 bg-slate-100 p-2 rounded-lg text-xs grayscale">📞</span>
+                <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                 <a href="tel:+13105042359" className="text-slate-900 text-[14px] font-800 tracking-tight hover:text-primary-600 transition-colors">(310) 504-2359</a>
               </div>
               <div className="flex gap-4 items-center">
-                <span className="text-slate-400 bg-slate-100 p-2 rounded-lg text-xs grayscale">✉️</span>
-                <p className="text-slate-900 text-[14px] font-800 tracking-tight">info@victoriatulsidaslaw.com</p>
+                <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                <a href="mailto:info@victoriatulsidaslaw.com" className="text-slate-900 text-[14px] font-800 tracking-tight hover:text-primary-600 transition-colors">info@victoriatulsidaslaw.com</a>
+              </div>
+              <div className="flex gap-4 items-center">
+                <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9-9H3m9 9V3m0 9l-9 9" /></svg>
+                <a href="https://www.victoriatulsidaslaw.com" className="text-slate-900 text-[14px] font-800 tracking-tight hover:text-primary-600 transition-colors">www.victoriatulsidaslaw.com</a>
               </div>
             </div>
           </div>
@@ -186,37 +191,36 @@ function PublicFooter() {
                 dynamicSocialLinks.map(social => {
                   const hasUrl = social.url && social.url.trim() !== '';
                   const IconMap = {
-                    LinkedIn: '💼',
-                    Instagram: '📸',
-                    Facebook: '👥',
-                    YouTube: '🎥'
+                    LinkedIn: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg>,
+                    Instagram: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>,
+                    Facebook: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" /></svg>,
+                    YouTube: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.42a2.78 2.78 0 00-1.94 2C1 8.14 1 12 1 12s0 3.86.4 5.58a2.78 2.78 0 001.94 2c1.72.42 8.6.42 8.6.42s6.88 0 8.6-.42a2.78 2.78 0 001.94-2C23 15.86 23 12 23 12s0-3.86-.4-5.58zM9.54 15.56V8.45L15.81 12l-6.27 3.56z" /></svg>
                   };
                   return (
-                    <a 
-                      key={social.platform} 
+                    <a
+                      key={social.platform}
                       href={hasUrl ? social.url : undefined}
                       target={hasUrl ? "_blank" : undefined}
                       rel={hasUrl ? "noopener noreferrer" : undefined}
-                      className={`flex items-center gap-3 p-4 bg-white border border-slate-100 rounded-3xl transition-all group shadow-sm ${
-                        hasUrl 
-                          ? 'hover:border-primary-500 hover:bg-primary-50 hover:shadow-md hover:-translate-y-1 cursor-pointer' 
+                      className={`flex items-center gap-3 p-4 bg-white border border-slate-100 rounded-3xl transition-all group shadow-sm ${hasUrl
+                          ? 'hover:border-primary-500 hover:bg-primary-50 hover:shadow-md hover:-translate-y-1 cursor-pointer'
                           : 'opacity-50 cursor-not-allowed'
-                      }`}
+                        }`}
                     >
-                      <span className="text-xl grayscale group-hover:grayscale-0 transition-all duration-300">
-                        {IconMap[social.platform] || '🔗'}
-                      </span>
+                      <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-primary-600 transition-colors">
+                        {IconMap[social.platform] || <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>}
+                      </div>
                       <div className="flex flex-col">
                         <span className="text-[11px] font-900 text-slate-500 group-hover:text-primary-800 uppercase tracking-[0.2em]">
                           {social.platform}
                         </span>
-                        {!hasUrl && <span className="text-[9px] text-slate-400 font-600 uppercase tracking-widest mt-0.5 italic">Not available</span>}
+                        {!hasUrl && <span className="text-[9px] text-slate-400 font-600 uppercase tracking-widest mt-0.5">Not available</span>}
                       </div>
                     </a>
                   );
                 })
               ) : (
-                <div className="text-slate-400 text-[11px] font-700 uppercase tracking-widest italic py-4">No social links configured</div>
+                <div className="text-slate-400 text-[11px] font-700 uppercase tracking-widest py-4">No social links configured</div>
               )}
             </div>
           </div>
@@ -225,14 +229,14 @@ function PublicFooter() {
         {/* Bottom Banner */}
         <div className="pt-8 sm:pt-10 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
           <p className="text-[11px] text-slate-400 font-700 tracking-tight text-center md:text-left leading-relaxed">
-            © 2026 Victoria Tulsidas Law. All legal representations are subject to conflict checks and engagement.
+            © {new Date().getFullYear()} Victoria Tulsidas Law. Submission of any inquiry does not establish an attorney-client relationship.
           </p>
           <div className="flex items-center gap-4 sm:gap-6 text-[10px] font-900 uppercase tracking-[0.2em] sm:tracking-[0.25em] text-slate-300 flex-wrap justify-center">
-            <span className="hover:text-slate-500 cursor-pointer transition-colors">Security</span>
+            <span className="hover:text-slate-500 cursor-pointer transition-colors">Security Registry</span>
             <div className="w-1 h-1 bg-slate-300 rounded-full" />
-            <span className="hover:text-slate-500 cursor-pointer transition-colors">Privacy</span>
+            <span className="hover:text-slate-500 cursor-pointer transition-colors">Privacy Protocol</span>
             <div className="w-1 h-1 bg-slate-300 rounded-full" />
-            <span className="hover:text-slate-500 cursor-pointer transition-colors">Terms</span>
+            <span className="hover:text-slate-500 cursor-pointer transition-colors">Terms of Engagement</span>
           </div>
         </div>
       </div>
@@ -244,7 +248,7 @@ export default function WebsiteLayout({ toast }) {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <PublicNavbar />
-      <main className="flex-1 pt-16 sm:pt-20 pb-8 sm:pb-12 px-4 sm:px-10 lg:px-12 max-w-[1600px] mx-auto w-full overflow-x-clip">
+      <main className="flex-1 pt-12 sm:pt-16 pb-8 sm:pb-12 px-4 sm:px-10 lg:px-12 max-w-[1600px] mx-auto w-full overflow-x-clip">
         <Outlet context={{ toast }} />
       </main>
       <PublicFooter />
