@@ -63,7 +63,7 @@ function LoginScreen({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-white overflow-hidden">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#05080f] overflow-hidden">
       {/* Left Panel - Cinematic Branding */}
       <div className="hidden md:flex md:w-[45%] lg:w-[40%] bg-[#05080f] relative flex-col items-center justify-center p-12 text-center border-r border-white/5">
         {/* Background Image with Overlay */}
@@ -79,13 +79,13 @@ function LoginScreen({ onLogin }) {
             </div>
             <div className="space-y-2">
               <h2 className="text-[#C9A24A] font-serif text-3xl tracking-wide">Victoria Tulsidas, JD</h2>
-              <p className="text-white/40 text-[11px] font-900 uppercase tracking-[0.5em] ml-1">Attorney At Law</p>
+              <p className="text-white/60 text-[11px] font-900 uppercase tracking-[0.5em] ml-1">Attorney At Law</p>
             </div>
           </div>
 
           <div className="space-y-4">
             <h1 className="text-white font-serif text-5xl leading-tight">Case Management<br/><span className="text-[#C9A24A]">Software</span></h1>
-            <p className="text-white/50 text-sm max-w-sm mx-auto leading-relaxed">
+            <p className="text-white/70 text-sm max-w-sm mx-auto leading-relaxed">
               Streamline your legal practice. Manage cases, clients, documents and billing all in one secure platform.
             </p>
           </div>
@@ -131,7 +131,7 @@ function LoginScreen({ onLogin }) {
               <span className="text-[12px] font-800 text-slate-500 uppercase tracking-widest">Case Management System</span>
             </div>
             <h2 className="text-white font-serif text-6xl tracking-tight leading-tight">Welcome <span className="text-[#C9A24A]">Back</span></h2>
-            <p className="text-slate-400 text-lg font-medium">Authorized personnel only. Please sign in to access the registry.</p>
+            <p className="text-white/80 text-lg font-medium">Authorized personnel only. Please sign in to access the registry.</p>
           </div>
 
           <div className="bg-white/[0.02] backdrop-blur-3xl rounded-[3rem] p-10 sm:p-14 shadow-2xl border border-white/10 relative overflow-hidden group">
@@ -157,7 +157,7 @@ function LoginScreen({ onLogin }) {
 
             <div className="space-y-8 mb-12 relative z-10">
               <div className="space-y-3">
-                <label className="block text-[11px] font-900 text-slate-400 uppercase tracking-[0.2em] ml-2">Email Identity</label>
+                <label className="block text-[11px] font-900 text-white/80 uppercase tracking-[0.2em] ml-2">Email Identity</label>
                 <div className="relative group/input">
                   <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-[#38bdf8] transition-colors">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
@@ -169,7 +169,7 @@ function LoginScreen({ onLogin }) {
               </div>
               
               <div className="space-y-3">
-                <label className="block text-[11px] font-900 text-slate-400 uppercase tracking-[0.2em] ml-2">Secure Credential</label>
+                <label className="block text-[11px] font-900 text-white/80 uppercase tracking-[0.2em] ml-2">Secure Credential</label>
                 <div className="relative group/input">
                   <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-[#38bdf8] transition-colors">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -184,7 +184,7 @@ function LoginScreen({ onLogin }) {
               </div>
 
               <div className="flex items-center justify-between px-2">
-                <label className="flex items-center gap-3 text-[13px] text-slate-400 font-600 cursor-pointer group">
+                <label className="flex items-center gap-3 text-[13px] text-white/80 font-600 cursor-pointer group">
                   <input type="checkbox" defaultChecked className="w-4.5 h-4.5 rounded-[6px] border-white/10 bg-white/5 text-[#0057c7] focus:ring-[#0057c7]/50" />
                   Remember this device
                 </label>

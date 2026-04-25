@@ -30,21 +30,21 @@ function PublicNavbar() {
 
   const navLinks = [
     { label: 'HOME', path: '/#home' },
-    { label: 'OUR FIRM', path: '/#our-firm' },
-    { label: 'PRAC AREAS', path: '/#practice-areas' },
+    { label: 'ABOUT', path: '/#our-firm' },
+    { label: 'PRACTICE AREAS', path: '/#practice-areas' },
     { label: 'CONTACT', path: '/#contact-us' },
     { label: 'CONSULTATION', path: '/#book-consultation' },
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md py-2 sm:py-2.5 shadow-sm border-b border-slate-100' : 'bg-transparent py-2.5 sm:py-4'}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${scrolled ? 'bg-[#111520]/95 backdrop-blur-md py-2 sm:py-2.5 shadow-xl border-b border-white/5' : 'bg-transparent py-2.5 sm:py-4'}`}>
       <div className="max-w-[1600px] mx-auto px-4 sm:px-10 lg:px-12 flex items-center justify-between gap-3">
         {/* Branding */}
         <Link to="/" className="flex items-center gap-3 group">
           <img src={logoImg} alt="Victoria Tulsidas Law" className="h-16 sm:h-20 w-auto object-contain group-hover:scale-105 transition-transform drop-shadow-md" />
           <div className="hidden sm:block">
-            <span className="text-slate-900 font-display font-900 text-2xl tracking-tight leading-none block">Victoria Tulsidas Law</span>
-            <span className="text-slate-500 text-[11px] font-600 block mt-1">A Professional Legal Corporation</span>
+            <span className="text-white font-display font-900 text-2xl tracking-tight leading-none block">Victoria Tulsidas Law</span>
+            <span className="text-white font-700 block mt-1 uppercase tracking-[0.25em] opacity-90">A Professional Legal Corporation</span>
           </div>
         </Link>
 
@@ -52,18 +52,18 @@ function PublicNavbar() {
         <div className="hidden lg:flex items-center gap-8">
           {navLinks.map(link => (
             <NavLink key={link.path} to={link.path}
-              className={({ isActive }) => `text-[12px] font-800 uppercase tracking-widest transition-colors ${isActive ? 'text-primary-600' : 'text-slate-600 hover:text-primary-600'}`}>
+              className={({ isActive }) => `text-[13px] font-900 uppercase tracking-widest transition-all duration-300 ${isActive ? 'text-white' : 'text-white/70 hover:text-white'}`}>
               {link.label}
             </NavLink>
           ))}
-          <Link to="/login" className="bg-primary-600 text-white px-6 py-3 rounded-xl text-[13px] font-800 uppercase tracking-wider hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/20 active:scale-[0.98]">
-            Login
+          <Link to="/login" className="bg-primary-600 text-white px-6 py-3 rounded-xl text-[13px] font-900 uppercase tracking-wider hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/20 active:scale-[0.98]">
+            LOGIN
           </Link>
         </div>
 
         {/* Mobile Toggle */}
         <button onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden w-10 h-10 flex items-center justify-center text-slate-700 active:scale-95 transition-transform"
+          className="lg:hidden w-10 h-10 flex items-center justify-center text-white active:scale-95 transition-transform"
           aria-label="Toggle Menu">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             {isOpen ? <path d="M6 18L18 6M6 6l12 12" /> : <path d="M4 8h16M4 16h16" />}
@@ -72,16 +72,16 @@ function PublicNavbar() {
       </div>
 
       {/* Mobile Menu */}
-      <div className={`lg:hidden fixed inset-0 top-0 left-0 w-full h-full bg-white z-[90] transition-transform duration-500 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="flex flex-col p-6 sm:p-8 pt-24 sm:pt-32 space-y-6 sm:space-y-8 bg-white min-h-screen overflow-y-auto">
+      <div className={`lg:hidden fixed inset-0 top-0 left-0 w-full h-full bg-[#111520] z-[90] transition-transform duration-500 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="flex flex-col p-6 sm:p-8 pt-24 sm:pt-32 space-y-6 sm:space-y-8 bg-[#111520] min-h-screen overflow-y-auto">
           {navLinks.map((link, i) => (
             <NavLink key={link.path} to={link.path}
               style={{ transitionDelay: `${i * 50}ms` }}
-              className={({ isActive }) => `text-xl sm:text-2xl font-800 tracking-tight transition-all ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'} ${isActive ? 'text-primary-600' : 'text-slate-900 hover:text-primary-600'}`}>
+              className={({ isActive }) => `text-xl sm:text-2xl font-800 tracking-tight transition-all ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'} ${isActive ? 'text-primary-500' : 'text-white hover:text-primary-500'}`}>
               {link.label}
             </NavLink>
           ))}
-          <div className={`pt-8 border-t border-slate-100 transition-all duration-500 delay-300 ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
+          <div className={`pt-8 border-t border-white/5 transition-all duration-500 delay-300 ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
             <Link to="/login" className="block w-full bg-primary-600 text-white text-center py-5 rounded-2xl font-800 text-lg shadow-2xl shadow-primary-600/30 active:scale-[0.98]">
               Login
             </Link>
@@ -113,7 +113,7 @@ function PublicFooter() {
   }, []);
 
   return (
-    <footer className="bg-slate-50 border-t border-slate-200 py-10 lg:py-16">
+    <footer className="bg-[#111520] border-t border-white/5 py-10 lg:py-16">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-10 lg:px-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-16 mb-10 sm:mb-12">
           {/* Brand Block */}
@@ -121,31 +121,31 @@ function PublicFooter() {
             <Link to="/" className="flex flex-col gap-4">
               <img src={logoImg} alt="Victoria Tulsidas Law" className="h-20 w-auto object-contain hover:scale-105 transition-all duration-500 mr-auto drop-shadow-md" />
               <div className="leading-tight">
-                <span className="text-slate-900 font-display font-900 text-2xl block tracking-tight">Victoria Tulsidas Law</span>
-                <span className="text-slate-500 text-[11px] font-600 block mt-1">A Professional Legal Corporation</span>
+                <span className="text-white font-display font-900 text-2xl block tracking-tight">Victoria Tulsidas Law</span>
+                <span className="text-slate-400 text-[11px] font-600 block mt-1">A Professional Legal Corporation</span>
               </div>
             </Link>
-            <div className="text-slate-500 text-[15px] leading-relaxed font-500 space-y-4">
+            <div className="text-slate-400 text-[15px] leading-relaxed font-500 space-y-4">
               <p>We deliver focused legal advocacy defined by precision, integrity, and disciplined strategy.</p>
               <p>Based in West Hollywood, serving clients throughout Southern California.</p>
             </div>
             <div className="pt-4">
-              <p className="text-primary-600 font-900 text-[13px] uppercase tracking-[0.25em] underline decoration-primary-200 underline-offset-[12px] decoration-2 transition-all hover:decoration-primary-600">www.VictoriaTulsidasLaw.com</p>
+              <p className="text-primary-500 font-900 text-[13px] uppercase tracking-[0.25em] underline decoration-primary-200/20 underline-offset-[12px] decoration-2 transition-all hover:decoration-primary-500">www.VictoriaTulsidasLaw.com</p>
             </div>
           </div>
 
           {/* Navigation Links */}
           <div>
-            <h4 className="text-slate-900 font-900 text-[11px] uppercase tracking-[0.4em] mb-12 leading-none opacity-80">Firm Navigation</h4>
+            <h4 className="text-white font-900 text-[11px] uppercase tracking-[0.4em] mb-12 leading-none opacity-80">Firm Navigation</h4>
             <div className="flex flex-col gap-6">
               {[
                 { label: 'Home', path: '/#home' },
-                { label: 'Our Firm', path: '/#our-firm' },
+                { label: 'About', path: '/#our-firm' },
                 { label: 'Practice Areas', path: '/#practice-areas' },
                 { label: 'Contact Us', path: '/#contact-us' },
                 { label: 'Client Login', path: '/login' }
               ].map(link => (
-                <Link key={link.label} to={link.path} className="text-slate-500 hover:text-primary-600 transition-all text-[15px] font-700 tracking-tight hover:translate-x-1">
+                <Link key={link.label} to={link.path} className="text-white/60 hover:text-primary-400 transition-all text-[15px] font-700 tracking-tight hover:translate-x-1">
                   {link.label}
                 </Link>
               ))}
@@ -154,7 +154,7 @@ function PublicFooter() {
 
           {/* Contact Details */}
           <div>
-            <h4 className="text-slate-900 font-900 text-[11px] uppercase tracking-[0.3em] mb-10 leading-none">Contact Our Office</h4>
+            <h4 className="text-white font-900 text-[11px] uppercase tracking-[0.3em] mb-10 leading-none">Contact Our Office</h4>
             <div className="space-y-6">
               <div className="flex gap-4 items-start">
                 <svg className="w-5 h-5 text-slate-400 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -164,22 +164,22 @@ function PublicFooter() {
               </div>
               <div className="flex gap-4 items-center">
                 <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                <a href="tel:+13105042359" className="text-slate-900 text-[14px] font-800 tracking-tight hover:text-primary-600 transition-colors">(310) 504-2359</a>
+                <a href="tel:+13105042359" className="text-white text-[14px] font-800 tracking-tight hover:text-primary-500 transition-colors">(310) 504-2359</a>
               </div>
               <div className="flex gap-4 items-center">
-                <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                <a href="mailto:info@victoriatulsidaslaw.com" className="text-slate-900 text-[14px] font-800 tracking-tight hover:text-primary-600 transition-colors">info@victoriatulsidaslaw.com</a>
+                <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                <a href="mailto:info@victoriatulsidaslaw.com" className="text-white text-[14px] font-800 tracking-tight hover:text-primary-500 transition-colors">info@victoriatulsidaslaw.com</a>
               </div>
               <div className="flex gap-4 items-center">
-                <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9-9H3m9 9V3m0 9l-9 9" /></svg>
-                <a href="https://www.victoriatulsidaslaw.com" className="text-slate-900 text-[14px] font-800 tracking-tight hover:text-primary-600 transition-colors">www.victoriatulsidaslaw.com</a>
+                <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9-9H3m9 9V3m0 9l-9 9" /></svg>
+                <a href="https://www.victoriatulsidaslaw.com" className="text-white text-[14px] font-800 tracking-tight hover:text-primary-500 transition-colors">www.victoriatulsidaslaw.com</a>
               </div>
             </div>
           </div>
 
           {/* Social Presence */}
           <div>
-            <h4 className="text-slate-900 font-900 text-[11px] uppercase tracking-[0.4em] mb-12 leading-none opacity-80">Connect with Us</h4>
+            <h4 className="text-white font-900 text-[11px] uppercase tracking-[0.4em] mb-12 leading-none opacity-80">Connect with Us</h4>
             <div className="flex flex-col gap-4">
               {loading ? (
                 <div className="space-y-4">
@@ -202,8 +202,8 @@ function PublicFooter() {
                       href={hasUrl ? social.url : undefined}
                       target={hasUrl ? "_blank" : undefined}
                       rel={hasUrl ? "noopener noreferrer" : undefined}
-                      className={`flex items-center gap-3 p-4 bg-white border border-slate-100 rounded-3xl transition-all group shadow-sm ${hasUrl
-                          ? 'hover:border-primary-500 hover:bg-primary-50 hover:shadow-md hover:-translate-y-1 cursor-pointer'
+                      className={`flex items-center gap-3 p-4 bg-white/5 border border-white/5 rounded-3xl transition-all group shadow-sm ${hasUrl
+                          ? 'hover:border-primary-500/50 hover:bg-white/10 hover:shadow-xl hover:-translate-y-1 cursor-pointer'
                           : 'opacity-50 cursor-not-allowed'
                         }`}
                     >
@@ -227,7 +227,7 @@ function PublicFooter() {
         </div>
 
         {/* Bottom Banner */}
-        <div className="pt-8 sm:pt-10 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
+        <div className="pt-8 sm:pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
           <p className="text-[11px] text-slate-400 font-700 tracking-tight text-center md:text-left leading-relaxed">
             © {new Date().getFullYear()} Victoria Tulsidas Law. Submission of any inquiry does not establish an attorney-client relationship.
           </p>
@@ -246,9 +246,9 @@ function PublicFooter() {
 
 export default function WebsiteLayout({ toast }) {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-[#111520]">
       <PublicNavbar />
-      <main className="flex-1 pt-12 sm:pt-16 pb-8 sm:pb-12 px-4 sm:px-10 lg:px-12 max-w-[1600px] mx-auto w-full overflow-x-clip">
+      <main className="flex-1 pt-24 sm:pt-28 lg:pt-36 pb-8 sm:pb-12 px-2 sm:px-6 lg:px-10 max-w-[1600px] mx-auto w-full overflow-x-clip">
         <Outlet context={{ toast }} />
       </main>
       <PublicFooter />
